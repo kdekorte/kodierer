@@ -1,5 +1,5 @@
 import XCTest
-@testable import EsysCore
+@testable import KodiererCore
 
 final class FDLEditTests: XCTestCase {
     /// The "Angel Eyes 50%" cheat from the community FDLCodes.xml:

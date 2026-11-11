@@ -1,5 +1,5 @@
 import XCTest
-@testable import EsysCore
+@testable import KodiererCore
 
 final class CAFDTests: XCTestCase {
     /// CAFD XML in the shape BMW's PsdZ library writes (namespace prefix "caf",

@@ -1,5 +1,5 @@
 import XCTest
-@testable import EsysCore
+@testable import KodiererCore
 
 /// Exercises the full client stack against the in-process virtual car:
 /// connect → identity → SVT scan → coding read → security → write → verify →
@@ -75,7 +75,7 @@ final class MockCarEndToEndTests: XCTestCase {
                                   sections: [CodingSection(did: 0x3000, bytes: [1, 2, 3])])
         backup.replace(section: CodingSection(did: 0x3000, bytes: [1, 2, 4]))
         let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("esys-test-\(UUID().uuidString).json")
+            .appendingPathComponent("kodierer-test-\(UUID().uuidString).json")
         defer { try? FileManager.default.removeItem(at: url) }
         try backup.save(to: url)
         let loaded = try CodingBackup.load(from: url)

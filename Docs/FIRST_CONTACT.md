@@ -7,7 +7,7 @@ Nothing is written to the car.
 ## 0. Build the tool
 
 ```bash
-cd ~/projects/esys
+cd ~/projects/kodierer
 swift build
 ```
 
@@ -26,7 +26,7 @@ ENET cable into the OBD port (driver footwell), adapter into the Mac.
   that is exactly what we want, not an error.
 
 ```bash
-swift run esys interface
+swift run kodierer interface
 ```
 
 Look for a line like `en5: 169.254.42.7  <- link-local (ENET link looks up)`.
@@ -36,7 +36,7 @@ another 30 s, run again.
 ## 3. Find the car
 
 ```bash
-swift run esys discover
+swift run kodierer discover
 ```
 
 Expected: `found car at 169.254.x.x — gateway 0x10, VIN WBA...`.
@@ -46,7 +46,7 @@ addresses.) If several cars are nearby (garage), pick yours by VIN.
 ## 4. Confirm identity and find the head unit
 
 ```bash
-swift run esys scan --host 169.254.x.x
+swift run kodierer scan --host 169.254.x.x
 ```
 
 Check:
@@ -62,7 +62,7 @@ The scan walks all addresses with a short timeout, so it takes a minute or two.
 ## 5. Back up the head unit coding
 
 ```bash
-swift run esys read --host 169.254.x.x --ecu 63 --out F25_HU_NBT_backup.json
+swift run kodierer read --host 169.254.x.x --ecu 63 --out F25_HU_NBT_backup.json
 ```
 
 This reads every coding section of the head unit into one JSON file. **Store it
@@ -86,7 +86,7 @@ the security algorithm (PROTOCOL.md §5) so the write step can be enabled.
 
 | Symptom | Fix |
 |---|---|
-| `esys interface` shows no 169.254 address | Wait longer; reseat cable; check adapter LEDs; try another USB port |
+| `kodierer interface` shows no 169.254 address | Wait longer; reseat cable; check adapter LEDs; try another USB port |
 | discover finds nothing | Re-run with `--timeout 5`; check the macOS firewall allows outgoing UDP; make sure the ignition is on |
 | scan lists nothing but discover worked | The ZGW granted the tester slot to someone else — close other apps, reconnect |
 | read fails with "no coding sections" | Wrong ECU address — check the scan output for the actual HU_NBT address |

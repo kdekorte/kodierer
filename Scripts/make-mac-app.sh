@@ -1,18 +1,18 @@
 #!/bin/bash
-# Builds the esys GUI as a double-clickable macOS app: build/EsysApp.app
-# (SwiftPM executables run fine via `swift run EsysApp`, but an .app bundle
+# Builds the kodierer GUI as a double-clickable macOS app: build/KodiererApp.app
+# (SwiftPM executables run fine via `swift run KodiererApp`, but an .app bundle
 # gets a dock icon, proper activation and the local-network permission prompt.)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-echo "==> building EsysApp (release)…"
-swift build -c release --product EsysApp
-BIN_DIR="$(swift build -c release --product EsysApp --show-bin-path)"
+echo "==> building KodiererApp (release)…"
+swift build -c release --product KodiererApp
+BIN_DIR="$(swift build -c release --product KodiererApp --show-bin-path)"
 
-APP="build/EsysApp.app"
+APP="build/KodiererApp.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS"
-cp "$BIN_DIR/EsysApp" "$APP/Contents/MacOS/EsysApp"
+cp "$BIN_DIR/KodiererApp" "$APP/Contents/MacOS/KodiererApp"
 
 cat > "$APP/Contents/Info.plist" <<'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -22,13 +22,13 @@ cat > "$APP/Contents/Info.plist" <<'EOF'
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
-	<string>EsysApp</string>
+	<string>KodiererApp</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.kdekorte.esys</string>
+	<string>com.kdekorte.kodierer</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>esys</string>
+	<string>kodierer</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -40,7 +40,7 @@ cat > "$APP/Contents/Info.plist" <<'EOF'
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>esys talks to your BMW's diagnostic gateway over the local network (ENET cable).</string>
+	<string>kodierer talks to your BMW's diagnostic gateway over the local network (ENET cable).</string>
 </dict>
 </plist>
 EOF

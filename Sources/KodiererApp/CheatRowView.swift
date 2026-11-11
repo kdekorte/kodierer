@@ -1,5 +1,5 @@
 import SwiftUI
-import EsysCore
+import KodiererCore
 
 /// One expandable cheat-sheet code row: operations, current bytes, Apply.
 struct CheatRowView: View {

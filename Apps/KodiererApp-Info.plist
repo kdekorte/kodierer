@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>esys</string>
+	<string>Kodierer</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -23,7 +23,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>esys talks to your BMW's diagnostic gateway over the local network (ENET cable via an adapter, or a WiFi ENET bridge).</string>
+	<string>kodierer talks to your BMW's diagnostic gateway over the local network (ENET cable via an adapter, or a WiFi ENET bridge).</string>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>

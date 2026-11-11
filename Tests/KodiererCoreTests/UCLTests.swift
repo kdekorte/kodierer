@@ -1,5 +1,5 @@
 import XCTest
-@testable import EsysCore
+@testable import KodiererCore
 
 /// Test encoder mirroring the reference bit writer (src/ucl_mchw.ch
 /// bbPutBit / bbPutByte / bbFlushBits): a bit word reserves its bytes in the

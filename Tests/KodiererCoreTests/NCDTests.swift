@@ -1,5 +1,5 @@
 import XCTest
-@testable import EsysCore
+@testable import KodiererCore
 
 final class NCDTests: XCTestCase {
     /// Builds one Motorola S-record line, checksum and all.

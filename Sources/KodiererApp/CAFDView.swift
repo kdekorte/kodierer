@@ -1,6 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
-import EsysCore
+import KodiererCore
 
 /// Tab 3 — browse a CAFD: parameters, values, current state, queue changes.
 struct CAFDView: View {

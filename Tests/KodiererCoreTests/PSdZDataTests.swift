@@ -1,5 +1,5 @@
 import XCTest
-@testable import EsysCore
+@testable import KodiererCore
 
 final class PSdZDataTests: XCTestCase {
     func testFileNameParsing() {
@@ -24,7 +24,7 @@ final class PSdZDataTests: XCTestCase {
 
     func testStoreLocatesCAFDs() throws {
         let root = FileManager.default.temporaryDirectory
-            .appendingPathComponent("esys-psdz-\(UUID().uuidString)")
+            .appendingPathComponent("kodierer-psdz-\(UUID().uuidString)")
         let cafdFolder = root.appendingPathComponent("swe/cafd")
         let swflFolder = root.appendingPathComponent("swe/swfl")
         try FileManager.default.createDirectory(at: cafdFolder, withIntermediateDirectories: true)
@@ -53,7 +53,7 @@ final class PSdZDataTests: XCTestCase {
 
         // A parent of the psdzdata folder works too.
         let parent = FileManager.default.temporaryDirectory
-            .appendingPathComponent("esys-psdz-parent-\(UUID().uuidString)")
+            .appendingPathComponent("kodierer-psdz-parent-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: parent) }
         try FileManager.default.createDirectory(
             at: parent.appendingPathComponent("psdzdata/swe/cafd"), withIntermediateDirectories: true)

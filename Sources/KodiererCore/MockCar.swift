@@ -30,7 +30,7 @@ public final class MockCar: @unchecked Sendable {
         }
     }
 
-    private let queue = DispatchQueue(label: "esys.mockcar")
+    private let queue = DispatchQueue(label: "kodierer.mockcar")
     private var listener: NWListener?
     private var modules: [UInt8: Module] = [:]
     private var connections: [ObjectIdentifier: ConnectionBox] = [:]

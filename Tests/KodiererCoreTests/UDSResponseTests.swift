@@ -1,5 +1,5 @@
 import XCTest
-@testable import EsysCore
+@testable import KodiererCore
 
 final class UDSResponseTests: XCTestCase {
     func testRequestBuilders() {

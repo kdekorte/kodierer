@@ -5,7 +5,7 @@ import Foundation
 /// FDL coding data lives in per-section DIDs: an NCD block's memory address is
 /// `DID * 256 + offset`. The section numbers shown in E-Sys, cheat sheets and
 /// CAFDs (3000, 3062, ...) are those DIDs written in hex, so their numeric
-/// value is 0x3000 = 12288, 0x3062 = 12386. `esys` stores the numeric value.
+/// value is 0x3000 = 12288, 0x3062 = 12386. `kodierer` stores the numeric value.
 public struct CodingSection: Codable, Equatable, Sendable {
     /// Section (= DID) number: the numeric value of the hex block address,
     /// e.g. 0x3062 = 12386.

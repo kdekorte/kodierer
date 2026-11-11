@@ -25,10 +25,10 @@ traffic; see `Docs/PROTOCOL.md`. One open item: the HU_NBT security algorithm.
 Read-only, zero risk:
 
 1. Get an ENET cable, plug into the X3, Mac interface to DHCP/link-local.
-2. `esys discover` → find the ZGW; confirm VIN.
-3. `esys scan` → verify HU_NBT address (expected 0x63) and read its SVK; record
+2. `kodierer discover` → find the ZGW; confirm VIN.
+3. `kodierer scan` → verify HU_NBT address (expected 0x63) and read its SVK; record
    the CAFD id/version and the I-Step.
-4. `esys read --ecu 63` → full coding backup of the head unit. **Keep it.**
+4. `kodierer read --ecu 63` → full coding backup of the head unit. **Keep it.**
 5. Optional: read a second module (KOMBI) to validate the flow.
 
 Deliverable: a real backup file + the exact CAFD/iStep identity of the car.
@@ -44,9 +44,9 @@ Deliverable: a real backup file + the exact CAFD/iStep identity of the car.
 
 ## Phase 4 — GUI apps (v1 done)
 
-- ✅ One SwiftUI codebase (`Sources/EsysApp`) over `EsysCore`, shipped two
-  ways: `swift run EsysApp` / `Scripts/make-mac-app.sh` on the Mac, and the
-  `Apps/EsysApp.xcodeproj` iOS app (iPhone/iPad; ENET via Apple USB-C Ethernet
+- ✅ One SwiftUI codebase (`Sources/KodiererApp`) over `KodiererCore`, shipped two
+  ways: `swift run KodiererApp` / `Scripts/make-mac-app.sh` on the Mac, and the
+  `Apps/KodiererApp.xcodeproj` iOS app (iPhone/iPad; ENET via Apple USB-C Ethernet
   adapter or a WiFi ENET bridge). Verified: `swift build` (macOS) and an
   iOS-Simulator `xcodebuild` both pass.
 - ✅ Car tab: one-click virtual-car demo (connect → identify → scan → read
@@ -65,9 +65,9 @@ Deliverable: a real backup file + the exact CAFD/iStep identity of the car.
 - ✅ CAFD parsing (decrypted CAFD XML, gzip-wrapped; namespace
   `http://bmw.com/2005/psdz.data.caf`) — datagroups → functions
   (start/end/mask) → values with coding rules; community names overlay
-  (OpenCAFDMap `names/*.tsv`); `esys cafd` CLI; backup decode joins
+  (OpenCAFDMap `names/*.tsv`); `kodierer cafd` CLI; backup decode joins
   (`CAFD.currentValue`, `CAFD.operation`).
-- ✅ PSdZData file naming/location (`esys psdz`), `.caf` content probing,
+- ✅ PSdZData file naming/location (`kodierer psdz`), `.caf` content probing,
   UCL NRV2B/D/E decompression (ported + round-trip tested against the
   reference compressor), NCD S-record parsing.
 - ⚠️ Real `.caf` files are PsdZ-encrypted; decrypted CAFD XML must come from

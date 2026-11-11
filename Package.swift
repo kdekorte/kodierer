@@ -2,35 +2,35 @@
 import PackageDescription
 
 let package = Package(
-    name: "esys",
+    name: "kodierer",
     platforms: [
         .macOS(.v13),
         .iOS(.v16)
     ],
     products: [
-        .library(name: "EsysCore", targets: ["EsysCore"]),
-        .executable(name: "esys", targets: ["EsysCLI"]),
-        .executable(name: "EsysApp", targets: ["EsysApp"])
+        .library(name: "KodiererCore", targets: ["KodiererCore"]),
+        .executable(name: "kodierer", targets: ["KodiererCLI"]),
+        .executable(name: "KodiererApp", targets: ["KodiererApp"])
     ],
     targets: [
         .target(
-            name: "EsysCore",
-            path: "Sources/EsysCore"
+            name: "KodiererCore",
+            path: "Sources/KodiererCore"
         ),
         .executableTarget(
-            name: "EsysCLI",
-            dependencies: ["EsysCore"],
-            path: "Sources/EsysCLI"
+            name: "KodiererCLI",
+            dependencies: ["KodiererCore"],
+            path: "Sources/KodiererCLI"
         ),
         .executableTarget(
-            name: "EsysApp",
-            dependencies: ["EsysCore"],
-            path: "Sources/EsysApp"
+            name: "KodiererApp",
+            dependencies: ["KodiererCore"],
+            path: "Sources/KodiererApp"
         ),
         .testTarget(
-            name: "EsysCoreTests",
-            dependencies: ["EsysCore"],
-            path: "Tests/EsysCoreTests"
+            name: "KodiererCoreTests",
+            dependencies: ["KodiererCore"],
+            path: "Tests/KodiererCoreTests"
         )
     ]
 )

@@ -34,7 +34,7 @@ public final class HSFZConnection: DiagTransport {
         }
     }
 
-    private let queue = DispatchQueue(label: "esys.hsfz.connection")
+    private let queue = DispatchQueue(label: "kodierer.hsfz.connection")
     private var connection: NWConnection?
     private var state: State = .new
     private var rx: [UInt8] = []
@@ -99,7 +99,7 @@ public final class HSFZConnection: DiagTransport {
         guard let nwPort = NWEndpoint.Port(rawValue: port) else { return false }
         return await withCheckedContinuation { cont in
             let conn = NWConnection(host: NWEndpoint.Host(host), port: nwPort, using: .tcp)
-            let workQueue = DispatchQueue(label: "esys.hsfz.probe")
+            let workQueue = DispatchQueue(label: "kodierer.hsfz.probe")
             var resumed = false
             let finish: (Bool) -> Void = { ok in
                 guard !resumed else { return }

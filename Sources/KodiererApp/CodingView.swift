@@ -1,5 +1,5 @@
 import SwiftUI
-import EsysCore
+import KodiererCore
 
 /// Tab 2 — the coding backup: sections, cheat-sheet options, apply/restore.
 struct CodingView: View {

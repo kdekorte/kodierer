@@ -1,6 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
-import EsysCore
+import KodiererCore
 
 extension UTType {
     /// Community names files (OpenCAFDMap `names/*.tsv`).

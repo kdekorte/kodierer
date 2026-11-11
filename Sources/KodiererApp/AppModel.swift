@@ -1,5 +1,5 @@
 import SwiftUI
-import EsysCore
+import KodiererCore
 
 /// All app state: connection, vehicle scan, coding backup, loaded definitions.
 /// One instance lives in `MainTabs` and is injected as an environment object.

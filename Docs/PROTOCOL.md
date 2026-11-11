@@ -36,7 +36,7 @@ traffic. Confidence marks: ✅ confirmed by multiple sources / real captures,
   DME `0x12`, FEM `0x40`, KOMBI `0x60`, **HU_NBT 0x63** (⚠️ verify by SVT scan),
   REM `0x72`.
 - Verified byte-for-byte against ISTA captures published with
-  kaiwen-z/bmw-enet-tool (see `Tests/EsysCoreTests/HSFZTests.swift`).
+  kaiwen-z/bmw-enet-tool (see `Tests/KodiererCoreTests/HSFZTests.swift`).
 
 ## 3. UDS usage (what E-Sys actually does)
 
@@ -59,7 +59,7 @@ Positive responses echo SID+0x40 plus the DID/routine id; negative responses are
 - Coding data lives in **per-section UDS DIDs**. An NCD (net coding data) block's
   memory address is `DID * 256 + offset`, and the section numbers in E-Sys,
   cheat sheets and CAFDs (3000, 3001, 3062, ...) are those DIDs **written in
-  hex** — so "3062" means DID 0x3062 = 12386, and `esys` stores the numeric
+  hex** — so "3062" means DID 0x3062 = 12386, and `kodierer` stores the numeric
   value everywhere. ✅ (kdrcoding/fake-car `Car.cs` `LoadNcd`; OpenCAFDMap
   `ocm/cod_import.py` — BimmerCode `.cod` `blockAddress` 12288 = 0x3000;
   datagroup `address` attributes in CAFD XML are the same hex block numbers.)
@@ -101,7 +101,7 @@ implementations live in `CAFD.swift`, `CAFDNames.swift`, `NCD.swift`,
 `<kind>_<id 8 hex>.<ext>.<main>_<sub>_<patch>`, e.g.
 `cafd_00000F07.caf.013_001_009`. Kinds: blup, btld, cafd, fafp, flsl, flup,
 gwtb, ibad, swfk, swfl, tlrt. The KIS databases (`psdzdata/kiswb/<series>/`,
-HSQLDB `.script` files) map SVT → software; `esys psdz` locates CAFDs by the
+HSQLDB `.script` files) map SVT → software; `kodierer psdz` locates CAFDs by the
 SVK id instead, so no KIS parsing is needed. (LeonB1ham/svt-psdzdata-export
 `engine.py`; kdrcoding/fake-car `CarBuilder.java`.)
 
@@ -111,7 +111,7 @@ only known decryption is BMW's own PsdZ library inside E-Sys
 project here — deliberately drives E-Sys's own jars (headless Nashorn,
 `esys/decrypt.js`) to produce decrypted **CAFD XML** (gzip-compressed,
 namespace `http://bmw.com/2005/psdz.data.caf`). No standalone open decryptor
-exists. Consequence for us: `esys` parses CAFD XML (and probes `.caf` files,
+exists. Consequence for us: `kodierer` parses CAFD XML (and probes `.caf` files,
 telling you which layer they're in), and the PSdZData path needs either a
 decrypted XML from an E-Sys machine or the community definition files.
 
@@ -131,7 +131,7 @@ decrypted XML from an E-Sys machine or the community definition files.
 - **Names are trimmed to "." in modern PSdZData**; readable names come from
   community lists keyed by `cafd + address + start + end + mask`
   (OpenCAFDMap `names/*.tsv`, CC0). `CAFDNames.swift` parses that format, and
-  `esys cafd <file> carplay --names <file>.tsv` is the search workflow.
+  `kodierer cafd <file> carplay --names <file>.tsv` is the search workflow.
 
 **UCL compression.** PSdZData flash files (SWFL/BTLD `.bin` + `.xml` sibling)
 declare per-segment `COMPRESSION-METHOD` of `gz`/`gzip` or `nrv`/`ucl` in the

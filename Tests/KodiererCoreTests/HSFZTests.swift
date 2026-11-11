@@ -1,5 +1,5 @@
 import XCTest
-@testable import EsysCore
+@testable import KodiererCore
 
 /// HSFZ codec tests, validated against real captured traffic published with
 /// the MIT-licensed bmw-enet-tool (ISTA talking to an F10 over ENET).

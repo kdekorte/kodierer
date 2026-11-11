@@ -1,5 +1,5 @@
 import SwiftUI
-import EsysCore
+import KodiererCore
 
 /// One CAFD function row: expand for its values; Set queues a change.
 struct CAFDFunctionRowView: View {

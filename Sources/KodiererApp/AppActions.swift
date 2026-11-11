@@ -1,5 +1,5 @@
 import Foundation
-import EsysCore
+import KodiererCore
 
 extension AppModel {
 

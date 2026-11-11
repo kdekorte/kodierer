@@ -1,5 +1,5 @@
 import SwiftUI
-import EsysCore
+import KodiererCore
 
 /// Tab 1 — connect (virtual demo car or the real one), scan, read coding.
 struct CarView: View {
