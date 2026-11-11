@@ -22,9 +22,9 @@ What we know:
 1. **Cheat-sheet import** (implemented): `CheatSheet.swift` parses the
    FDLCodes.xml format (`<cafd>/<code>/<group>/<function start end mask>`).
    Drop a sheet covering your CAFD into the app and the option appears with
-   its exact byte edits. `kodierer cheat --file <sheet.xml> --cafd HU_NBT` lists it.
-2. **One-time calibration** (planned): `kodierer read` before and after making the
-   change once with E-Sys; `kodierer diff` shows the changed byte. That offset can
+   its exact byte edits. `kodierer-cli cheat --file <sheet.xml> --cafd HU_NBT` lists it.
+2. **One-time calibration** (planned): `kodierer-cli read` before and after making the
+   change once with E-Sys; `kodierer-cli diff` shows the changed byte. That offset can
    then be saved as a named parameter in the app's registry — after that, the
    app never needs E-Sys again.
 3. **CAFD parsing** (later): read parameter definitions straight from PSdZData.

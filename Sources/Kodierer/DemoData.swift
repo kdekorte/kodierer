@@ -1,7 +1,7 @@
 import Foundation
 import KodiererCore
 
-/// Built-in demo definitions — 100% synthetic (mirrors the CLI `kodierer demo`
+/// Built-in demo definitions — 100% synthetic (mirrors the CLI `kodierer-cli demo`
 /// fixtures and MockCar's data) so every screen can be tried without files or
 /// hardware. The CarPlay bit here is NOT a real offset for any real CAFD.
 enum DemoData {

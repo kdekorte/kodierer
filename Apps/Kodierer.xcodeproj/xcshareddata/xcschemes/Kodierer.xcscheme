@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "610000000000000000000001"
-               BuildableName = "KodiererApp.app"
-               BlueprintName = "KodiererApp"
-               ReferencedContainer = "container:KodiererApp.xcodeproj">
+               BuildableName = "Kodierer.app"
+               BlueprintName = "Kodierer"
+               ReferencedContainer = "container:Kodierer.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "610000000000000000000001"
-            BuildableName = "KodiererApp.app"
-            BlueprintName = "KodiererApp"
-            ReferencedContainer = "container:KodiererApp.xcodeproj">
+            BuildableName = "Kodierer.app"
+            BlueprintName = "Kodierer"
+            ReferencedContainer = "container:Kodierer.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "610000000000000000000001"
-            BuildableName = "KodiererApp.app"
-            BlueprintName = "KodiererApp"
-            ReferencedContainer = "container:KodiererApp.xcodeproj">
+            BuildableName = "Kodierer.app"
+            BlueprintName = "Kodierer"
+            ReferencedContainer = "container:Kodierer.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

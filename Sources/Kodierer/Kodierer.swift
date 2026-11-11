@@ -4,10 +4,10 @@ import AppKit
 #endif
 
 @main
-struct KodiererAppRoot: App {
+struct KodiererRoot: App {
     #if os(macOS)
     init() {
-        // `swift run KodiererApp` starts us without an app bundle; become a regular
+        // `swift run Kodierer` starts us without an app bundle; become a regular
         // frontmost app so the window gets focus and a dock icon.
         NSApplication.shared.setActivationPolicy(.regular)
         NSApplication.shared.activate(ignoringOtherApps: true)

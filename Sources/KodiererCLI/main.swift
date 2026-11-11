@@ -43,30 +43,30 @@ func parseECU(_ text: String) -> UInt8? {
 
 switch command {
 case "version":
-    print("kodierer 0.1.0 — BMW F-series coding toolkit (E-Sys alternative, work in progress)")
+    print("kodierer-cli 0.1.0 — BMW F-series coding toolkit (E-Sys alternative, work in progress)")
 
 case "help", "--help", "-h":
     print("""
-    kodierer — BMW F-series coding toolkit
+    kodierer-cli — BMW F-series coding toolkit
 
     USAGE:
-      kodierer interface                          show network interfaces + ENET link check
-      kodierer discover [--timeout 2]            find cars on the link-local network (UDP 6811 + probe)
-      kodierer scan --host <ip> [--dwell 0.25]   connect, read VIN/I-Step, list ECUs (SVT)
-      kodierer read --host <ip> [--ecu 63] [--out file.json]
+      kodierer-cli interface                          show network interfaces + ENET link check
+      kodierer-cli discover [--timeout 2]            find cars on the link-local network (UDP 6811 + probe)
+      kodierer-cli scan --host <ip> [--dwell 0.25]   connect, read VIN/I-Step, list ECUs (SVT)
+      kodierer-cli read --host <ip> [--ecu 63] [--out file.json]
                                              read an ECU's coding data into a backup
-      kodierer diff <a.json> <b.json>            byte-level diff of two coding backups
-      kodierer cheat --file <FDLCodes.xml> [--cafd HU_NBT]
+      kodierer-cli diff <a.json> <b.json>            byte-level diff of two coding backups
+      kodierer-cli cheat --file <FDLCodes.xml> [--cafd HU_NBT]
                                              list coding options from a cheat sheet
-      kodierer cafd <file> [search] [--names <n.tsv>] [--series F025] [--backup <b.json>]
+      kodierer-cli cafd <file> [search] [--names <n.tsv>] [--series F025] [--backup <b.json>]
                                              inspect a CAFD: sections, parameters, values
-      kodierer psdz <folder> [--cafd 00000F07]  locate + probe CAFD files in a PSdZData folder
-      kodierer ncd <file.ncd> [--out b.json] [--ecu 63]
+      kodierer-cli psdz <folder> [--cafd 00000F07]  locate + probe CAFD files in a PSdZData folder
+      kodierer-cli ncd <file.ncd> [--out b.json] [--ecu 63]
                                              read an E-Sys .ncd coding data file
-      kodierer demo                              full workflow against the virtual car (no real car)
-      kodierer version
+      kodierer-cli demo                              full workflow against the virtual car (no real car)
+      kodierer-cli version
 
-    SAFETY: writes to a real car require a backup (kodierer read) and the HU_NBT
+    SAFETY: writes to a real car require a backup (kodierer-cli read) and the HU_NBT
     security algorithm, which is not implemented yet — see Docs/PROTOCOL.md.
     """)
 
@@ -82,10 +82,10 @@ case "interface":
           1. plug the ENET cable into the car (ignition on) and the adapter into the Mac
           2. System Settings > Network > (the USB/Lightning Ethernet adapter) > "Using DHCP"
           3. wait ~30 s — macOS shows "Self-Assigned IP" when it picks 169.254.x.x, that is GOOD
-          4. run this again, then `kodierer discover`
+          4. run this again, then `kodierer-cli discover`
         """)
     } else {
-        print("link-local address present — run `kodierer discover` next")
+        print("link-local address present — run `kodierer-cli discover` next")
     }
 
 case "discover":
@@ -169,7 +169,7 @@ case "read":
     connection.close()
 
 case "diff":
-    guard arguments.count >= 3 else { fail("usage: kodierer diff <a.json> <b.json>") }
+    guard arguments.count >= 3 else { fail("usage: kodierer-cli diff <a.json> <b.json>") }
     do {
         let a = try CodingBackup.load(from: URL(fileURLWithPath: arguments[1]))
         let b = try CodingBackup.load(from: URL(fileURLWithPath: arguments[2]))
@@ -202,7 +202,7 @@ case "cheat":
 case "cafd": {
     let positional = arguments.dropFirst().filter { !$0.hasPrefix("--") }
     guard let path = positional.first else {
-        fail("usage: kodierer cafd <file> [search] [--names <n.tsv>] [--series F025] [--backup <b.json>] [--all]")
+        fail("usage: kodierer-cli cafd <file> [search] [--names <n.tsv>] [--series F025] [--backup <b.json>] [--all]")
     }
     do {
         let data = try Data(contentsOf: URL(fileURLWithPath: path))
@@ -275,7 +275,7 @@ case "cafd": {
 case "psdz": {
     let positional = arguments.dropFirst().filter { !$0.hasPrefix("--") }
     guard let folder = positional.first else {
-        fail("usage: kodierer psdz <PSdZData folder> [--cafd 00000F07] [--series F025]")
+        fail("usage: kodierer-cli psdz <PSdZData folder> [--cafd 00000F07] [--series F025]")
     }
     let store = PSdZDataStore(path: folder)
     guard let sweRoot = store.sweRoot else {
@@ -285,7 +285,7 @@ case "psdz": {
     if let cafdText = options["cafd"] {
         let text = cafdText.hasPrefix("0x") ? String(cafdText.dropFirst(2)) : cafdText
         guard let id = UInt32(text, radix: 16) ?? UInt32(text) else {
-            fail("--cafd must be a hex id like 00000F07 (from `kodierer read`'s SVK report)")
+            fail("--cafd must be a hex id like 00000F07 (from `kodierer-cli read`'s SVK report)")
         }
         let files = store.files(kind: "cafd", id: id)
         guard !files.isEmpty else {
@@ -298,7 +298,7 @@ case "psdz": {
                   + (probe.detail.isEmpty ? "" : " — \(probe.detail)"))
             if let cafd = probe.cafd {
                 print("    \(cafd.datagroups.count) datagroups, \(cafd.functionCount) functions"
-                      + " — inspect with: kodierer cafd \"\(url.path)\"")
+                      + " — inspect with: kodierer-cli cafd \"\(url.path)\"")
             }
         }
     } else {
@@ -306,14 +306,14 @@ case "psdz": {
             let count = store.files(kind: kind).count
             if count > 0 { print("  \(kind): \(count) files") }
         }
-        print("inspect one CAFD with: kodierer psdz <folder> --cafd <id from the SVK>")
+        print("inspect one CAFD with: kodierer-cli psdz <folder> --cafd <id from the SVK>")
     }
 }()
 
 case "ncd": {
     let positional = arguments.dropFirst().filter { !$0.hasPrefix("--") }
     guard let path = positional.first else {
-        fail("usage: kodierer ncd <file.ncd> [--out backup.json] [--ecu 63]")
+        fail("usage: kodierer-cli ncd <file.ncd> [--out backup.json] [--ecu 63]")
     }
     do {
         let ncd = try NCD.parse(url: URL(fileURLWithPath: path))
@@ -338,7 +338,7 @@ case "ncd": {
 }()
 
 case "demo":
-    print("=== kodierer demo: virtual F25, no real car involved ===\n")
+    print("=== kodierer-cli demo: virtual F25, no real car involved ===\n")
     let car = MockCar()
     do {
         try await car.start()
@@ -392,5 +392,5 @@ case "demo":
           "the real HU_NBT security algorithm (Docs/PROTOCOL.md), and a verified cheat entry.")
 
 default:
-    fail("unknown command '\(command)' — try `kodierer help`")
+    fail("unknown command '\(command)' — try `kodierer-cli help`")
 }

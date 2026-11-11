@@ -9,8 +9,8 @@ let package = Package(
     ],
     products: [
         .library(name: "KodiererCore", targets: ["KodiererCore"]),
-        .executable(name: "kodierer", targets: ["KodiererCLI"]),
-        .executable(name: "KodiererApp", targets: ["KodiererApp"])
+        .executable(name: "kodierer-cli", targets: ["KodiererCLI"]),
+        .executable(name: "Kodierer", targets: ["Kodierer"])
     ],
     targets: [
         .target(
@@ -23,9 +23,9 @@ let package = Package(
             path: "Sources/KodiererCLI"
         ),
         .executableTarget(
-            name: "KodiererApp",
+            name: "Kodierer",
             dependencies: ["KodiererCore"],
-            path: "Sources/KodiererApp"
+            path: "Sources/Kodierer"
         ),
         .testTarget(
             name: "KodiererCoreTests",

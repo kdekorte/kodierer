@@ -9,7 +9,7 @@ bytes that changed** — starting with `CARPLAY_FULLSCREEN`.
 
 - **Shared Swift core** (`KodiererCore`): protocol stack + coding engine, compiles for
   macOS *and* iOS (same TCP code path via Network.framework).
-- **CLI** (`kodierer`) and a **SwiftUI GUI** (`KodiererApp`) on top of the same core —
+- **CLI** (`kodierer-cli`) and a **SwiftUI GUI** (`Kodierer`) on top of the same core —
   the GUI runs on the Mac and on iPhone/iPad from one codebase.
 - **A virtual BMW** (`MockCar`) runs the documented protocol in-process, so the whole
   stack is testable without touching a real car.
@@ -25,7 +25,7 @@ bytes that changed** — starting with `CARPLAY_FULLSCREEN`.
 | SVT scan (find ECUs + names + SVK/CAFD) | ✅ implemented |
 | FDL coding read → JSON backup, diff, restore | ✅ implemented |
 | Cheat-sheet import (FDLCodes.xml format) | ✅ implemented |
-| CAFD parsing (decrypted CAFD XML, gzip, names TSV) | ✅ implemented — `kodierer cafd` |
+| CAFD parsing (decrypted CAFD XML, gzip, names TSV) | ✅ implemented — `kodierer-cli cafd` |
 | PSdZData folder / `.caf` file probing + UCL (NRV2B/D/E) + NCD | ✅ implemented |
 | Coding write with security unlock + verify | ✅ engine done — works vs. virtual car |
 | HU_NBT security seed/key algorithm | ⚠️ **open** — the one blocker for real-car writes |
@@ -42,16 +42,16 @@ compressor.
 ```bash
 swift build
 swift test
-swift run kodierer demo      # full workflow against the virtual car — no hardware needed
-swift run kodierer help
+swift run kodierer-cli demo   # full workflow against the virtual car — no hardware needed
+swift run kodierer-cli help
 ```
 
 Against the real car (read-only steps are safe):
 
 ```bash
-swift run kodierer discover                      # find the car on 169.254.x.x
-swift run kodierer scan --host 169.254.9.103     # VIN, I-Step, list of modules
-swift run kodierer read --host 169.254.9.103 --ecu 63 --out hu_backup.json
+swift run kodierer-cli discover                  # find the car on 169.254.x.x
+swift run kodierer-cli scan --host 169.254.9.103 # VIN, I-Step, list of modules
+swift run kodierer-cli read --host 169.254.9.103 --ecu 63 --out hu_backup.json
 ```
 
 Guided walkthrough for the target car (ENET cable + USB-C Ethernet adapter):
@@ -60,14 +60,14 @@ see **`Docs/FIRST_CONTACT.md`**.
 Working with coding data files (no car needed):
 
 ```bash
-swift run kodierer cafd <cafd.xml> carplay --names <names.tsv> --series F025
+swift run kodierer-cli cafd <cafd.xml> carplay --names <names.tsv> --series F025
                               # search a CAFD for parameters; join a backup
                               # with --backup to see current values
-swift run kodierer psdz <PSdZData> --cafd 0000F07
+swift run kodierer-cli psdz <PSdZData> --cafd 0000F07
                               # locate a CAFD in a PSdZData folder and probe
                               # which format layer it is in (XML / gzip / UCL /
                               # PSdZ-encrypted)
-swift run kodierer ncd <file.ncd> # read an E-Sys .ncd coding file
+swift run kodierer-cli ncd <file.ncd> # read an E-Sys .ncd coding file
 ```
 
 Current PSdZData `.caf` files are PsdZ-encrypted (only BMW's own library in
@@ -91,11 +91,17 @@ The same `KodiererCore` powers a SwiftUI app with three tabs:
 On the Mac:
 
 ```bash
-swift run KodiererApp            # straight from the package
-Scripts/make-mac-app.sh      # or build a double-clickable build/KodiererApp.app
+swift run Kodierer               # straight from the package
+Scripts/make-mac-app.sh      # or build a double-clickable build/Kodierer.app
 ```
 
-On iPhone/iPad: open `Apps/KodiererApp.xcodeproj` in Xcode, set your team under
+The .app bundles the CLI as well, so it works without a checkout:
+
+```bash
+build/Kodierer.app/Contents/MacOS/kodierer-cli help
+```
+
+On iPhone/iPad: open `Apps/Kodierer.xcodeproj` in Xcode, set your team under
 Signing & Capabilities (CI builds use no code signing), and run it on a device.
 Connect the car with an ENET cable into an Apple USB-C Ethernet adapter (or a
 WiFi ENET bridge) — iOS asks once for local-network permission. The demo car
@@ -109,10 +115,10 @@ dongle — both confirmed by BimmerCode's adapter matrix).
 
 ```
 Sources/KodiererCore/   protocol + coding engine (shared by Mac and iOS)
-Sources/KodiererCLI/    command line tool
-Sources/KodiererApp/    SwiftUI GUI (one codebase, Mac + iPhone)
+Sources/KodiererCLI/    command line tool (the `kodierer-cli` binary)
+Sources/Kodierer/       SwiftUI GUI (one codebase, Mac + iPhone)
 Apps/               Xcode project for the iOS app (+ its Info.plist)
-Scripts/            make-mac-app.sh — Mac .app bundler
+Scripts/            make-mac-app.sh — Mac .app bundler (bundles the CLI)
 Tests/KodiererCoreTests unit + end-to-end tests (virtual car)
 Docs/               plan, protocol research, parameters, safety
 ```
