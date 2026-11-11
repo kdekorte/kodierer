@@ -52,9 +52,17 @@ Deliverable: a real backup file + the exact CAFD/iStep identity of the car.
 
 ## Phase 5 — "all the settings"
 
-- CAFD parsing (PSdZData) to enumerate every parameter with names/choices
-  instead of relying on cheat sheets; symbolic value resolution (aktiv /
-  nicht_aktiv / enums) from the CAFD itself.
+- ✅ CAFD parsing (decrypted CAFD XML, gzip-wrapped; namespace
+  `http://bmw.com/2005/psdz.data.caf`) — datagroups → functions
+  (start/end/mask) → values with coding rules; community names overlay
+  (OpenCAFDMap `names/*.tsv`); `esys cafd` CLI; backup decode joins
+  (`CAFD.currentValue`, `CAFD.operation`).
+- ✅ PSdZData file naming/location (`esys psdz`), `.caf` content probing,
+  UCL NRV2B/D/E decompression (ported + round-trip tested against the
+  reference compressor), NCD S-record parsing.
+- ⚠️ Real `.caf` files are PsdZ-encrypted; decrypted CAFD XML must come from
+  an E-Sys machine (OpenCAFDMap's decrypt.js path) or community definitions —
+  the tool treats PSdZData as optional enrichment, never a dependency.
 - E-Sys Launcher cheat format import (superset of FDLCodes.xml).
 - Optional: FA read/write, more modules, G-series DoIP (codec exists).
 

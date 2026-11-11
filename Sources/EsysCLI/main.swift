@@ -58,6 +58,11 @@ case "help", "--help", "-h":
       esys diff <a.json> <b.json>            byte-level diff of two coding backups
       esys cheat --file <FDLCodes.xml> [--cafd HU_NBT]
                                              list coding options from a cheat sheet
+      esys cafd <file> [search] [--names <n.tsv>] [--series F025] [--backup <b.json>]
+                                             inspect a CAFD: sections, parameters, values
+      esys psdz <folder> [--cafd 00000F07]  locate + probe CAFD files in a PSdZData folder
+      esys ncd <file.ncd> [--out b.json] [--ecu 63]
+                                             read an E-Sys .ncd coding data file
       esys demo                              full workflow against the virtual car (no real car)
       esys version
 
@@ -141,7 +146,7 @@ case "read":
     print("VIN: \(identity.vin ?? "?") — reading coding of ECU 0x\(String(ecu, radix: 16))…")
     do {
         let backup = try await session.readCoding(ecu: ecu) { did in
-            print("  read section \(did)")
+            print(String(format: "  read section %04X", did))
         }
         print("\(backup.sections.count) sections, \(backup.sections.reduce(0) { $0 + $1.bytes.count }) bytes")
         if let svkHex = backup.svkHex, let svkBytes = Bytes.fromHex(svkHex) {
@@ -185,7 +190,7 @@ case "cheat":
         for code in codes {
             print("• \(code.description)  [\(code.cafdName ?? code.cafdID ?? "?")]")
             for op in code.operations {
-                print("    section \(op.group) byte \(op.start)\(op.start == op.end ? "" : "...\(op.end)")" +
+                print("    section \(String(format: "%04X", op.group)) byte \(op.start)\(op.start == op.end ? "" : "...\(op.end)")" +
                       " mask \(String(op.mask, radix: 2)) = \(op.value)")
             }
         }
@@ -193,6 +198,144 @@ case "cheat":
     } catch {
         fail("\(error)")
     }
+
+case "cafd": {
+    let positional = arguments.dropFirst().filter { !$0.hasPrefix("--") }
+    guard let path = positional.first else {
+        fail("usage: esys cafd <file> [search] [--names <n.tsv>] [--series F025] [--backup <b.json>] [--all]")
+    }
+    do {
+        let data = try Data(contentsOf: URL(fileURLWithPath: path))
+        let probe = CAFDProbe.probe(data: data, series: options["series"])
+        print("\(path): \(probe.kind.rawValue)" + (probe.detail.isEmpty ? "" : " — \(probe.detail)"))
+        guard let cafd = probe.cafd else {
+            fail("cannot parse this file as CAFD data (see the note above)")
+        }
+        var names: CAFDNames?
+        if let namesPath = options["names"] {
+            names = try CAFDNames.parse(url: URL(fileURLWithPath: namesPath))
+        }
+        var backup: CodingBackup?
+        if let backupPath = options["backup"] {
+            backup = try CodingBackup.load(from: URL(fileURLWithPath: backupPath))
+        }
+        let cafdID = SWEFileName.parse(URL(fileURLWithPath: path).lastPathComponent)
+            .map { String(format: "%08X", $0.id) }
+        let showAll = options["all"] != nil
+        let search = showAll ? "*" : (options["search"] ?? positional.dropFirst().first)?.lowercased()
+
+        print("\(cafd.datagroups.count) datagroups, \(cafd.functionCount) functions"
+              + (cafd.mainSeries.isEmpty ? "" : ", series: " + cafd.mainSeries.joined(separator: ", "))
+              + (search == nil ? " — pass a search term (or --all) to list parameters" : ""))
+        for dg in cafd.datagroups {
+            let groupName = names?.groupName(datagroup: dg, cafdID: cafdID)
+            if let search, search != "*" {
+                let haystack = ((groupName ?? "") + " " + dg.functions.map {
+                    names?.functionName(datagroup: dg, function: $0, cafdID: cafdID) ?? $0.placeholderName
+                }.joined(separator: " ")).lowercased()
+                guard haystack.contains(search) else { continue }
+            }
+            print(String(format: "datagroup %04X", dg.address)
+                  + " (\(dg.datagroupClass ?? "?"), \(dg.functions.count) functions)"
+                  + (groupName.map { " — \($0)" } ?? ""))
+            guard search != nil else { continue }
+            for fn in dg.functions {
+                let name = names?.functionName(datagroup: dg, function: fn, cafdID: cafdID)
+                    ?? fn.placeholderName
+                if let search, search != "*", !name.lowercased().contains(search),
+                   !(groupName ?? "").lowercased().contains(search) { continue }
+                var line = "  byte \(fn.start)\(fn.start == fn.end ? "" : "-\(fn.end)")"
+                    + "  mask \(fn.maskText ?? "-")  \(name)"
+                if let backup, let section = backup.section(dg.address),
+                   let current = CAFD.maskedHex(sectionBytes: section.bytes, function: fn) {
+                    line += "  = \(current)"
+                    if let match = cafd.currentValue(of: fn, in: dg, backup: backup) {
+                        line += match.isDefault ? "  [default]" : "  [wert_\(match.index + 1)]"
+                    }
+                }
+                print(line)
+                for value in fn.values {
+                    let valueName = names?.valueName(datagroup: dg, function: fn, value: value, cafdID: cafdID)
+                    var text = String(format: "      wert_%02d  %@", value.index + 1, value.hex)
+                    if value.isDefault { text += "  [default]" }
+                    if let valueName, !valueName.isEmpty { text += "  \(valueName)" }
+                    if case .applicable(let rule) = value.rule {
+                        let short = rule.text.count > 56 ? String(rule.text.prefix(56)) + "…" : rule.text
+                        text += "  [\(short)]"
+                    }
+                    print(text)
+                }
+            }
+        }
+    } catch {
+        fail("\(error)")
+    }
+}()
+
+case "psdz": {
+    let positional = arguments.dropFirst().filter { !$0.hasPrefix("--") }
+    guard let folder = positional.first else {
+        fail("usage: esys psdz <PSdZData folder> [--cafd 00000F07] [--series F025]")
+    }
+    let store = PSdZDataStore(path: folder)
+    guard let sweRoot = store.sweRoot else {
+        fail("no swe/ folder under '\(folder)' — point this at the PSdZData folder (or its parent)")
+    }
+    print("PSdZData: \(sweRoot.path)")
+    if let cafdText = options["cafd"] {
+        let text = cafdText.hasPrefix("0x") ? String(cafdText.dropFirst(2)) : cafdText
+        guard let id = UInt32(text, radix: 16) ?? UInt32(text) else {
+            fail("--cafd must be a hex id like 00000F07 (from `esys read`'s SVK report)")
+        }
+        let files = store.files(kind: "cafd", id: id)
+        guard !files.isEmpty else {
+            fail("no CAFD \(String(format: "%08X", id)) in this PSdZData — check the SVK id first")
+        }
+        for (name, url) in files {
+            let data = (try? Data(contentsOf: url)) ?? Data()
+            let probe = CAFDProbe.probe(data: data, series: options["series"])
+            print("\(name.fileName): \(probe.kind.rawValue)"
+                  + (probe.detail.isEmpty ? "" : " — \(probe.detail)"))
+            if let cafd = probe.cafd {
+                print("    \(cafd.datagroups.count) datagroups, \(cafd.functionCount) functions"
+                      + " — inspect with: esys cafd \"\(url.path)\"")
+            }
+        }
+    } else {
+        for kind in PSdZDataStore.kinds {
+            let count = store.files(kind: kind).count
+            if count > 0 { print("  \(kind): \(count) files") }
+        }
+        print("inspect one CAFD with: esys psdz <folder> --cafd <id from the SVK>")
+    }
+}()
+
+case "ncd": {
+    let positional = arguments.dropFirst().filter { !$0.hasPrefix("--") }
+    guard let path = positional.first else {
+        fail("usage: esys ncd <file.ncd> [--out backup.json] [--ecu 63]")
+    }
+    do {
+        let ncd = try NCD.parse(url: URL(fileURLWithPath: path))
+        if let id = ncd.cafdID {
+            print("CAFD \(String(format: "%08X", id))"
+                  + (ncd.version.map { String(format: " version %03d_%03d_%03d", $0.main, $0.sub, $0.patch) } ?? ""))
+        } else {
+            print("no S0 header — sections only")
+        }
+        for section in ncd.sections {
+            print(String(format: "  section %04X: %d bytes", section.did, section.bytes.count))
+        }
+        if let out = options["out"] {
+            let ecuText = options["ecu"] ?? "63"
+            let ecu = Int(ecuText, radix: 16) ?? Int(ecuText) ?? 0x63
+            try ncd.backup(ecuAddress: ecu).save(to: URL(fileURLWithPath: out))
+            print("saved backup to \(out) (ECU 0x\(String(ecu, radix: 16)))")
+        }
+    } catch {
+        fail("\(error)")
+    }
+}()
 
 case "demo":
     print("=== esys demo: virtual F25, no real car involved ===\n")
@@ -228,12 +371,12 @@ case "demo":
           "\(backup.sections.reduce(0) { $0 + $1.bytes.count }) bytes (backup kept in memory)")
 
     // 4. Apply the demo edit (like a cheat-sheet CarPlay toggle)
-    let before = car.codingBytes(did: 3000)![96]
+    let before = car.codingBytes(did: 0x3000)![96]
     let modified = try await session.applyOperations([MockCar.demoOperation()], to: backup,
                                                       description: "demo bit",
                                                       security: MockCarAlgorithm())
-    let after = car.codingBytes(did: 3000)![96]
-    print("4. applied demo edit — section 3000 byte 96: \(String(before, radix: 16)) -> " +
+    let after = car.codingBytes(did: 0x3000)![96]
+    print("4. applied demo edit — section 0x3000 byte 96: \(String(before, radix: 16)) -> " +
           String(after, radix: 16) + " (security unlocked, verified by re-read)")
 
     // 5. Diff
@@ -242,8 +385,8 @@ case "demo":
 
     // 6. Restore
     try await session.restore(backup, security: MockCarAlgorithm())
-    let backToOriginal = car.codingBytes(did: 3000)![96] == before
-    print("6. restore from backup — byte 96 back to \(String(car.codingBytes(did: 3000)![96], radix: 16)): " +
+    let backToOriginal = car.codingBytes(did: 0x3000)![96] == before
+    print("6. restore from backup — byte 96 back to \(String(car.codingBytes(did: 0x3000)![96], radix: 16)): " +
           (backToOriginal ? "OK" : "FAILED"))
     print("\ndemo complete — the same flow against a real car needs: ENET cable, " +
           "the real HU_NBT security algorithm (Docs/PROTOCOL.md), and a verified cheat entry.")

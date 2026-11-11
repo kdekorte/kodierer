@@ -83,7 +83,8 @@ final class CheatSheetParserDelegate: NSObject, XMLParserDelegate {
             codeDescription = attributes["description"] ?? ""
             operations = []
         case "group":
-            groupID = attributes["id"].flatMap { Int($0) }
+            // Group ids are hex block numbers ("3062" = 0x3062 = DID 12386).
+            groupID = attributes["id"].flatMap { Int($0, radix: 16) }
         case "function":
             functionStart = attributes["start"].flatMap { Int($0) }
             functionEnd = attributes["end"].flatMap { Int($0) }

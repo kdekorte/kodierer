@@ -3,10 +3,12 @@ import Foundation
 /// One FDL coding section: a UDS DID and its current bytes.
 ///
 /// FDL coding data lives in per-section DIDs: an NCD block's memory address is
-/// `DID * 256 + offset`, and the section numbers shown in E-Sys / cheat sheets
-/// (3000, 3001, 3062, ...) are those DID numbers in decimal.
+/// `DID * 256 + offset`. The section numbers shown in E-Sys, cheat sheets and
+/// CAFDs (3000, 3062, ...) are those DIDs written in hex, so their numeric
+/// value is 0x3000 = 12288, 0x3062 = 12386. `esys` stores the numeric value.
 public struct CodingSection: Codable, Equatable, Sendable {
-    /// Section (= DID) number, decimal, e.g. 3062.
+    /// Section (= DID) number: the numeric value of the hex block address,
+    /// e.g. 0x3062 = 12386.
     public let did: Int
     public private(set) var bytes: [UInt8]
 
@@ -116,7 +118,7 @@ public func describeDiffs(_ diffs: [SectionDiff]) -> String {
     guard !diffs.isEmpty else { return "identical" }
     var lines: [String] = []
     for diff in diffs {
-        lines.append("section \(diff.did):")
+        lines.append(String(format: "section %04X:", diff.did))
         for change in diff.changes {
             lines.append(String(format: "  byte %3d: %02X -> %02X", change.offset, change.from, change.to))
         }

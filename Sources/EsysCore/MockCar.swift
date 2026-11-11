@@ -73,19 +73,20 @@ public final class MockCar: @unchecked Sendable {
         hu.dids[BMWDID.ecuName] = Array("HU_NBT".utf8)
         hu.dids[BMWDID.vin] = Array(vin.utf8)
         hu.dids[BMWDID.svk] = Self.svk(cafdID: 0x0000F007, cafdVersions: (13, 1, 9))
-        // Coding sections. Byte 96 of section 3000 is the demo parameter bit.
+        // Coding sections (block numbers are hex: 0x3000, 0x3001, ...).
+        // Byte 96 of section 0x3000 is the demo parameter bit.
         var section3000 = Self.pattern(length: 256)
         section3000[96] = 0x00
-        hu.dids[UInt16(3000)] = section3000
-        hu.dids[UInt16(3001)] = Self.pattern(length: 128)
-        hu.dids[UInt16(3002)] = Self.pattern(length: 64)
-        hu.dids[UInt16(3010)] = Self.pattern(length: 32)
+        hu.dids[UInt16(0x3000)] = section3000
+        hu.dids[UInt16(0x3001)] = Self.pattern(length: 128)
+        hu.dids[UInt16(0x3002)] = Self.pattern(length: 64)
+        hu.dids[UInt16(0x3010)] = Self.pattern(length: 32)
         modules[hu.address] = hu
     }
 
-    /// The demo edit: set bit 0x10 of byte 96 in section 3000 of the head unit.
+    /// The demo edit: set bit 0x10 of byte 96 in section 0x3000 of the head unit.
     public static func demoOperation() -> FDLOperation {
-        FDLOperation(group: 3000, start: 96, end: 96, mask: 0x10, value: .bytes([0x10]))
+        FDLOperation(group: 0x3000, start: 96, end: 96, mask: 0x10, value: .bytes([0x10]))
     }
 
     private static func pattern(length: Int) -> [UInt8] {

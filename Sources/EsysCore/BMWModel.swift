@@ -51,9 +51,11 @@ public enum BMWDID {
     public static let codingStamp: UInt16 = 0x37FE
 
     /// Range of DIDs that hold FDL coding data ("sections"). An NCD block's
-    /// memory address is DID * 256 + offset, and cheat-sheet groups (3000,
-    /// 3001, 3062, ...) are these block numbers in decimal.
-    public static let codingSectionRange: ClosedRange<Int> = 3000...3199
+    /// memory address is DID * 256 + offset; block numbers are written in hex
+    /// (3000, 3062, ...) and double as the UDS DIDs, so the numeric range is
+    /// 0x3000...0x30FF. The authoritative per-ECU list lives in its CAFD
+    /// (CAFD.swift); this range is only the discovery default.
+    public static let codingSectionRange: ClosedRange<Int> = 0x3000...0x30FF
 }
 
 /// One entry of the SVK (software version container, DID 0xF101): a software
