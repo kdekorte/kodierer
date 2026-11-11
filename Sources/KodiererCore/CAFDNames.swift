@@ -21,6 +21,9 @@ public struct CAFDNames: Sendable {
         public let valueHex: String?
         public let name: String
         public let comment: String?
+        /// Optional 9th column: the category (BimmerCode-style group) the
+        /// function belongs to, e.g. "Media", "Comfort", "Lighting".
+        public let category: String?
     }
 
     public let entries: [Entry]
@@ -47,10 +50,11 @@ public struct CAFDNames: Sendable {
             let valueHex = fields[5].trimmingCharacters(in: .whitespaces).uppercased()
             let name = fields[6].trimmingCharacters(in: .whitespaces)
             let comment = fields.count > 7 ? fields[7].trimmingCharacters(in: .whitespaces) : nil
+            let category = fields.count > 8 ? fields[8].trimmingCharacters(in: .whitespaces) : nil
             guard !name.isEmpty else { continue }
             entries.append(Entry(cafdID: id, address: address, start: start, end: end, mask: mask,
                                  valueHex: valueHex.isEmpty ? nil : valueHex,
-                                 name: name, comment: comment))
+                                 name: name, comment: comment, category: category))
         }
         return CAFDNames(entries: entries)
     }
@@ -93,6 +97,16 @@ extension CAFDNames {
             matches($0, cafdID: cafdID, address: datagroup.address,
                     start: function.start, end: function.end, mask: function.mask)
         }?.name
+    }
+
+    /// BimmerCode-style category for a function, if the names list carries one
+    /// (optional 9th column). Functions without a category fall back to the
+    /// datagroup's name, handled by the caller.
+    public func functionCategory(datagroup: CAFD.Datagroup, function: CAFD.Function, cafdID: String? = nil) -> String? {
+        entries.first {
+            matches($0, cafdID: cafdID, address: datagroup.address,
+                    start: function.start, end: function.end, mask: function.mask)
+        }?.category
     }
 
     /// Name for one value of a function (community name or nil).

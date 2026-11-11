@@ -1,10 +1,15 @@
 import SwiftUI
+import UniformTypeIdentifiers
 import KodiererCore
 
-/// Tab 2 — the coding backup: sections, cheat-sheet options, apply/restore.
+/// Tab 2 — the BimmerCode-style coding screen: a searchable tree of
+/// Category → Option → Choice, plus the backup controls and cheat sheets.
 struct CodingView: View {
     @EnvironmentObject var model: AppModel
+    @State private var searchText = ""
     @State private var showCheatImporter = false
+    @State private var showCAFDImporter = false
+    @State private var showNamesImporter = false
     @State private var showBackupImporter = false
     @State private var showBackupExporter = false
     @State private var confirmRestore = false
@@ -56,13 +61,19 @@ struct CodingView: View {
                 .padding(.vertical, 2)
             }
 
-            Section("Sections") {
-                ForEach(backup.sections, id: \.did) { section in
+            if let cafd = model.cafd {
+                optionSections(cafd)
+            } else {
+                Section {
+                    Text("Load a CAFD + community names to browse named coding options here.")
+                        .foregroundColor(.secondary)
+                } header: {
+                    Text("Coding options")
+                } footer: {
                     HStack {
-                        Text(String(format: "§ %04X", section.did)).font(.callout.monospaced())
-                        Text("\(section.bytes.count) bytes").font(.caption).foregroundColor(.secondary)
-                        Spacer()
-                        Text(hexPreview(section.bytes)).font(.caption.monospaced()).foregroundColor(.secondary)
+                        Button("Open CAFD…") { showCAFDImporter = true }
+                        Button("Names…") { showNamesImporter = true }
+                        Button("Load demo definitions") { model.loadDemoDefinitions() }
                     }
                 }
             }
@@ -95,6 +106,12 @@ struct CodingView: View {
         .fileImporter(isPresented: $showCheatImporter, allowedContentTypes: [.xml]) { result in
             if case .success(let url) = result { model.loadCheatSheet(url: url) }
         }
+        .fileImporter(isPresented: $showCAFDImporter, allowedContentTypes: [.xml, .gzip, .data]) { result in
+            if case .success(let url) = result { model.loadCAFD(url: url) }
+        }
+        .fileImporter(isPresented: $showNamesImporter, allowedContentTypes: [UTType.tsvFile, .plainText]) { result in
+            if case .success(let url) = result { model.loadNames(url: url) }
+        }
         .fileExporter(isPresented: $showBackupExporter, document: BackupDocument(backup),
                       contentType: .json, defaultFilename: defaultName(backup)) { result in
             if case .success(let url) = result {
@@ -107,6 +124,52 @@ struct CodingView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("Writes every section of the backup back to the car. On a real HU_NBT this needs the security algorithm, which is not implemented yet — the write will be refused.")
+        }
+    }
+
+    // MARK: Option tree
+
+    /// The BimmerCode-style tree: one section per category, one row per option.
+    @ViewBuilder private func optionSections(_ cafd: CAFD) -> some View {
+        let categories = OptionTree.filter(
+            OptionTree.categories(cafd: cafd, names: model.names, backup: model.backup),
+            matching: searchText)
+        ForEach(categories) { category in
+            Section {
+                ForEach(category.options) { option in
+                    OptionRowView(option: option)
+                }
+            } header: {
+                HStack {
+                    Text(category.name)
+                    Spacer()
+                    Text("\(category.options.count) options")
+                        .font(.caption).foregroundColor(.secondary)
+                }
+            }
+        }
+        Section {
+            HStack {
+                TextField("Search options", text: $searchText)
+                    .textFieldStyle(.roundedBorder)
+                TextField("Series", text: $model.cafdSeries)
+                    .textFieldStyle(.roundedBorder).frame(width: 80)
+                    .onSubmit { model.reloadCAFD() }
+                Button("Resolve") { model.reloadCAFD() }
+                Spacer()
+                Text("\(cafd.functionCount) functions · \(model.cafdFileName)")
+                    .font(.caption).foregroundColor(.secondary)
+            }
+        } header: {
+            Text("Coding options")
+        } footer: {
+            HStack {
+                Button("Open CAFD…") { showCAFDImporter = true }
+                Button("Names…") { showNamesImporter = true }
+                Button("Load demo definitions") { model.loadDemoDefinitions() }
+                Spacer()
+                Text("Pick a value to queue the change; Apply to car writes the queue.")
+            }
         }
     }
 

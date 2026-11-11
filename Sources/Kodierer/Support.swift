@@ -12,6 +12,17 @@ struct PendingChange: Identifiable, Equatable {
     let id = UUID()
     let label: String
     let operation: FDLOperation
+    /// Identifies the function this change belongs to, so re-picking a value
+    /// replaces the earlier queued choice instead of stacking duplicates.
+    var key: String? = nil
+    /// Hex of the queued CAFD value — used to show which choice is pending.
+    var choiceID: String? = nil
+
+    /// Stable identity of one function inside a CAFD.
+    static func key(datagroup: CAFD.Datagroup, function: CAFD.Function) -> String {
+        let mask = function.mask.map { String(format: "%02X", $0) } ?? (function.maskText ?? "-")
+        return "\(datagroup.address)|\(function.start)|\(function.end)|\(mask)"
+    }
 }
 
 /// A cheat-sheet code with a stable identity for list rendering.

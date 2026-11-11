@@ -8,6 +8,7 @@ extension AppModel {
     var canApply: Bool { session != nil && backup != nil && !queue.isEmpty }
 
     /// Line up a CAFD value as a write operation (applied via Apply to car).
+    /// Re-picking a value for the same function replaces the queued choice.
     func queueSet(value: CAFD.Value, function: CAFD.Function, datagroup: CAFD.Datagroup) {
         guard let cafd else { return }
         guard let operation = cafd.operation(setting: value, of: function, in: datagroup) else {
@@ -18,7 +19,19 @@ extension AppModel {
             ?? function.placeholderName
         let valueTitle = names?.valueName(datagroup: datagroup, function: function, value: value)
             ?? "wert_\(String(format: "%02d", value.index))"
-        queue.append(PendingChange(label: "\(functionTitle) = \(valueTitle)", operation: operation))
+        let key = PendingChange.key(datagroup: datagroup, function: function)
+        queue.removeAll { $0.key == key }
+        queue.append(PendingChange(label: "\(functionTitle) = \(valueTitle)",
+                                   operation: operation, key: key, choiceID: value.hex))
+    }
+
+    /// BimmerCode-style option selection: picking a choice queues it (replacing
+    /// any earlier choice for the same function); picking the current value
+    /// reverts the option to unchanged.
+    func setChoice(_ choice: CodingChoice, for option: CodingOption) {
+        queue.removeAll { $0.key == option.key }
+        guard choice.id != option.currentChoiceID else { return }
+        queueSet(value: choice.value, function: option.function, datagroup: option.datagroup)
     }
 
     func applyQueue() async {
@@ -142,6 +155,93 @@ extension AppModel {
             entries.append(CheatEntry(id: id, code: code))
         }
         cheatEntries = entries
+    }
+
+    // MARK: Data folder
+
+    /// Candidate `Data/` folders scanned at startup (see Docs/DATA_FILES.md):
+    /// the working directory when run via `swift run` from the repo, and the
+    /// app bundle's resources for a packaged app.
+    var dataFolders: [URL] {
+        let fm = FileManager.default
+        var folders: [URL] = []
+        #if os(macOS)
+        folders.append(URL(fileURLWithPath: fm.currentDirectoryPath).appendingPathComponent("Data"))
+        #endif
+        if let bundled = Bundle.main.resourceURL?.appendingPathComponent("Data") {
+            folders.append(bundled)
+        }
+        return folders.filter { fm.fileExists(atPath: $0.path) }
+    }
+
+    /// Auto-loads definitions and backups from the `Data/` folder convention:
+    /// `Data/names/*.tsv`, `Data/cafds/*` (decrypted CAFD XML, plain or gzip),
+    /// `Data/cheats/*.xml` (FDLCodes-style), `Data/backups/*.json` (newest).
+    /// Quiet: files that fail to parse are skipped.
+    func loadDataFolder() {
+        let fm = FileManager.default
+        var loaded: [String] = []
+
+        /// URLs in `sub` with one of `extensions`, or every file when nil.
+        func list(_ folder: URL, _ sub: String, extensions: [String]? = nil) -> [URL] {
+            guard let files = try? fm.contentsOfDirectory(at: folder.appendingPathComponent(sub),
+                                                          includingPropertiesForKeys: nil) else { return [] }
+            guard let extensions else { return files }
+            return files.filter { extensions.contains($0.pathExtension.lowercased()) }
+        }
+
+        for folder in dataFolders {
+            // Community names — every *.tsv merged into one list.
+            let tsvFiles = list(folder, "names", extensions: ["tsv"])
+            if !tsvFiles.isEmpty {
+                var entries = names?.entries ?? []
+                for url in tsvFiles {
+                    if let parsed = try? CAFDNames.parse(url: url) { entries += parsed.entries }
+                }
+                if !entries.isEmpty {
+                    names = CAFDNames(entries: entries)
+                    loaded.append("\(tsvFiles.count) names file(s)")
+                }
+            }
+
+            // Decrypted CAFDs — the first parseable file becomes the browsed CAFD.
+            if cafd == nil {
+                for url in list(folder, "cafds").sorted(by: { $0.lastPathComponent < $1.lastPathComponent }) {
+                    guard let data = try? Data(contentsOf: url),
+                          (try? CAFD.parse(data: data, series: cafdSeries)) != nil else { continue }
+                    cafdData = data
+                    cafdFileName = url.lastPathComponent
+                    reloadCAFD()
+                    loaded.append(url.lastPathComponent)
+                    break
+                }
+            }
+
+            // Cheat sheets — every FDLCodes-style XML.
+            for url in list(folder, "cheats", extensions: ["xml"]) {
+                if let sheet = try? CheatSheet.parse(url: url) {
+                    appendCheatCodes(sheet.codes())
+                    loaded.append("\(url.lastPathComponent) (cheats)")
+                }
+            }
+
+            // Saved backups — the newest JSON becomes the loaded backup.
+            if backup == nil {
+                func modified(_ url: URL) -> Date {
+                    (try? url.resourceValues(forKeys: [.contentModificationDateKey]))?
+                        .contentModificationDate ?? .distantPast
+                }
+                if let url = list(folder, "backups", extensions: ["json"]).sorted(by: { modified($0) > modified($1) }).first,
+                   let parsed = try? CodingBackup.load(from: url) {
+                    backup = parsed
+                    loaded.append(url.lastPathComponent)
+                }
+            }
+        }
+
+        if !loaded.isEmpty {
+            showMessage("Auto-loaded from Data/: " + loaded.joined(separator: ", "))
+        }
     }
 
     // MARK: Decoding helpers for the views

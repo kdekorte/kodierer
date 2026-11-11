@@ -52,6 +52,10 @@ final class AppModel: ObservableObject {
     private(set) var mockCar: MockCar?
     var securityAlgorithm: (any SecurityAlgorithm)?
 
+    init() {
+        loadDataFolder()
+    }
+
     var isConnected: Bool { session != nil }
 
     /// nil once the Mac has a 169.254.x.x address (ENET link up).
