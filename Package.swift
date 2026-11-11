@@ -9,7 +9,8 @@ let package = Package(
     ],
     products: [
         .library(name: "EsysCore", targets: ["EsysCore"]),
-        .executable(name: "esys", targets: ["EsysCLI"])
+        .executable(name: "esys", targets: ["EsysCLI"]),
+        .executable(name: "EsysApp", targets: ["EsysApp"])
     ],
     targets: [
         .target(
@@ -20,6 +21,11 @@ let package = Package(
             name: "EsysCLI",
             dependencies: ["EsysCore"],
             path: "Sources/EsysCLI"
+        ),
+        .executableTarget(
+            name: "EsysApp",
+            dependencies: ["EsysCore"],
+            path: "Sources/EsysApp"
         ),
         .testTarget(
             name: "EsysCoreTests",

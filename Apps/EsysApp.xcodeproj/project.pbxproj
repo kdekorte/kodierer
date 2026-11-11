@@ -1,0 +1,262 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	objectVersion = 56;
+	classes = {
+	};
+	objects = {
+
+/* Begin PBXBuildFile section */
+		110000000000000000000001 /* AppActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 210000000000000000000001 /* AppActions.swift */; };
+		110000000000000000000002 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 210000000000000000000002 /* AppModel.swift */; };
+		110000000000000000000003 /* CAFDRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 210000000000000000000003 /* CAFDRowView.swift */; };
+		110000000000000000000004 /* CAFDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 210000000000000000000004 /* CAFDView.swift */; };
+		110000000000000000000005 /* CarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 210000000000000000000005 /* CarView.swift */; };
+		110000000000000000000006 /* CheatRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 210000000000000000000006 /* CheatRowView.swift */; };
+		110000000000000000000007 /* CodingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 210000000000000000000007 /* CodingView.swift */; };
+		110000000000000000000008 /* DemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 210000000000000000000008 /* DemoData.swift */; };
+		110000000000000000000009 /* EsysApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 210000000000000000000009 /* EsysApp.swift */; };
+		110000000000000000000010 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 210000000000000000000010 /* Support.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		210000000000000000000001 /* AppActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppActions.swift; sourceTree = "<group>"; };
+		210000000000000000000002 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		210000000000000000000003 /* CAFDRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CAFDRowView.swift; sourceTree = "<group>"; };
+		210000000000000000000004 /* CAFDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CAFDView.swift; sourceTree = "<group>"; };
+		210000000000000000000005 /* CarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarView.swift; sourceTree = "<group>"; };
+		210000000000000000000006 /* CheatRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheatRowView.swift; sourceTree = "<group>"; };
+		210000000000000000000007 /* CodingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodingView.swift; sourceTree = "<group>"; };
+		210000000000000000000008 /* DemoData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoData.swift; sourceTree = "<group>"; };
+		210000000000000000000009 /* EsysApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EsysApp.swift; sourceTree = "<group>"; };
+		210000000000000000000010 /* Support.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
+		210000000000000000000011 /* EsysApp-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "EsysApp-Info.plist"; sourceTree = "<group>"; };
+		510000000000000000000001 /* EsysApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EsysApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		310000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		410000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				420000000000000000000001 /* Sources */,
+				430000000000000000000001 /* Products */,
+				210000000000000000000011 /* EsysApp-Info.plist */,
+			);
+			sourceTree = "<group>";
+		};
+		420000000000000000000001 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				210000000000000000000001 /* AppActions.swift */,
+				210000000000000000000002 /* AppModel.swift */,
+				210000000000000000000003 /* CAFDRowView.swift */,
+				210000000000000000000004 /* CAFDView.swift */,
+				210000000000000000000005 /* CarView.swift */,
+				210000000000000000000006 /* CheatRowView.swift */,
+				210000000000000000000007 /* CodingView.swift */,
+				210000000000000000000008 /* DemoData.swift */,
+				210000000000000000000009 /* EsysApp.swift */,
+				210000000000000000000010 /* Support.swift */,
+			);
+			name = Sources;
+			path = ../../Sources/EsysApp;
+			sourceTree = "<group>";
+		};
+		430000000000000000000001 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				510000000000000000000001 /* EsysApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		610000000000000000000001 /* EsysApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 810000000000000000000001 /* Build configuration list for PBXNativeTarget "EsysApp" */;
+			buildPhases = (
+				620000000000000000000001 /* Sources */,
+				310000000000000000000001 /* Frameworks */,
+				630000000000000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				640000000000000000000001 /* PBXTargetDependency */,
+			);
+			name = EsysApp;
+			packageProductDependencies = (
+				650000000000000000000001 /* EsysCore */,
+			);
+			productName = EsysApp;
+			productReference = 510000000000000000000001 /* EsysApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		700000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1400;
+				LastUpgradeCheck = 1400;
+				TargetAttributes = {
+					610000000000000000000001 = {
+						CreatedOnToolsVersion = 14.0;
+					};
+				};
+			};
+			buildConfigurationList = 800000000000000000000001 /* Build configuration list for PBXProject "EsysApp" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 410000000000000000000001;
+			packageReferences = (
+				710000000000000000000001 /* XCLocalSwiftPackageReference ".." */,
+			);
+			productRefGroup = 430000000000000000000001 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				610000000000000000000001 /* EsysApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		630000000000000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		620000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				110000000000000000000001 /* AppActions.swift in Sources */,
+				110000000000000000000002 /* AppModel.swift in Sources */,
+				110000000000000000000003 /* CAFDRowView.swift in Sources */,
+				110000000000000000000004 /* CAFDView.swift in Sources */,
+				110000000000000000000005 /* CarView.swift in Sources */,
+				110000000000000000000006 /* CheatRowView.swift in Sources */,
+				110000000000000000000007 /* CodingView.swift in Sources */,
+				110000000000000000000008 /* DemoData.swift in Sources */,
+				110000000000000000000009 /* EsysApp.swift in Sources */,
+				110000000000000000000010 /* Support.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		640000000000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 650000000000000000000001 /* EsysCore */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		820000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		820000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		830000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				INFOPLIST_FILE = "EsysApp-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kdekorte.esys;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		830000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				INFOPLIST_FILE = "EsysApp-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kdekorte.esys;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		800000000000000000000001 /* Build configuration list for PBXProject "EsysApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				820000000000000000000001 /* Debug */,
+				820000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		810000000000000000000001 /* Build configuration list for PBXNativeTarget "EsysApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				830000000000000000000001 /* Debug */,
+				830000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		710000000000000000000001 /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		650000000000000000000001 /* EsysCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EsysCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 700000000000000000000001 /* Project object */;
+}

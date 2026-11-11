@@ -1,5 +1,5 @@
 .DS_Store
 .build/
-*.xcodeproj
+build/
 Package.resolved
 coding_*.json

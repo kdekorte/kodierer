@@ -7,8 +7,8 @@ bytes that changed** — starting with `CARPLAY_FULLSCREEN`.
 
 - **Shared Swift core** (`EsysCore`): protocol stack + coding engine, compiles for
   macOS *and* iOS (same TCP code path via Network.framework).
-- **CLI** (`esys`) for the Mac first; a GUI app and the iPhone app come later on top
-  of the same core.
+- **CLI** (`esys`) and a **SwiftUI GUI** (`EsysApp`) on top of the same core —
+  the GUI runs on the Mac and on iPhone/iPad from one codebase.
 - **A virtual BMW** (`MockCar`) runs the documented protocol in-process, so the whole
   stack is testable without touching a real car.
 
@@ -28,7 +28,7 @@ bytes that changed** — starting with `CARPLAY_FULLSCREEN`.
 | Coding write with security unlock + verify | ✅ engine done — works vs. virtual car |
 | HU_NBT security seed/key algorithm | ⚠️ **open** — the one blocker for real-car writes |
 | CARPLAY_FULLSCREEN offsets for your CAFD | ⚠️ **open** — needs decrypted CAFD + names entry for your iStep |
-| GUI / iOS app | planned |
+| GUI / iOS app | ✅ v1 — SwiftUI app (Mac + iPhone/iPad) over `EsysCore` |
 
 All 43 unit/integration tests pass, including a full end-to-end run against the
 virtual car (`swift test`, see `Tests/EsysCoreTests/MockCarEndToEndTests.swift`)
@@ -72,15 +72,45 @@ Current PSdZData `.caf` files are PsdZ-encrypted (only BMW's own library in
 E-Sys decrypts them); `esys` consumes the decrypted **CAFD XML** the community
 tooling produces — see `Docs/PROTOCOL.md` §6 for the full story and sources.
 
-Hardware: an **ENET cable** into a USB-C Ethernet adapter on the Mac (and later,
-per BimmerCode's own docs, the same works with an Apple Lightning/USB-C Ethernet
-adapter on iPhone, or a WiFi ENET bridge dongle).
+## GUI app (Mac + iPhone)
+
+The same `EsysCore` powers a SwiftUI app with three tabs:
+
+- **Car** — one-click virtual-car demo (full connect → scan → read → write flow),
+  or Discover / Connect & Scan against the real car, live module list with
+  SVK/CAFD ids, per-module coding read.
+- **Coding** — the backup browser (sections + hex preview), cheat-sheet import
+  (`FDLCodes.xml`) with current-value decode and already-active detection,
+  apply with verify, restore, backup save/load (JSON, CLI-compatible).
+- **CAFD** — open a decrypted CAFD XML (gzip ok) plus a community names TSV,
+  resolve coding rules for your series, search every parameter, see the
+  current value joined against the backup, queue and apply changes.
+
+On the Mac:
+
+```bash
+swift run EsysApp            # straight from the package
+Scripts/make-mac-app.sh      # or build a double-clickable build/EsysApp.app
+```
+
+On iPhone/iPad: open `Apps/EsysApp.xcodeproj` in Xcode, set your team under
+Signing & Capabilities (CI builds use no code signing), and run it on a device.
+Connect the car with an ENET cable into an Apple USB-C Ethernet adapter (or a
+WiFi ENET bridge) — iOS asks once for local-network permission. The demo car
+also works in the simulator with no hardware at all.
+
+Hardware: an **ENET cable** into a USB-C Ethernet adapter on the Mac (and on
+iPhone via an Apple Lightning/USB-C Ethernet adapter, or a WiFi ENET bridge
+dongle — both confirmed by BimmerCode's adapter matrix).
 
 ## Repository layout
 
 ```
 Sources/EsysCore/   protocol + coding engine (shared by Mac and iOS)
 Sources/EsysCLI/    command line tool
+Sources/EsysApp/    SwiftUI GUI (one codebase, Mac + iPhone)
+Apps/               Xcode project for the iOS app (+ its Info.plist)
+Scripts/            make-mac-app.sh — Mac .app bundler
 Tests/EsysCoreTests unit + end-to-end tests (virtual car)
 Docs/               plan, protocol research, parameters, safety
 ```

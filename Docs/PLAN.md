@@ -42,13 +42,23 @@ Deliverable: a real backup file + the exact CAFD/iStep identity of the car.
   (Y-series ID6), or derive by diffing a before/after E-Sys change once, then
   hard-code it as a first-class parameter (see PARAMETERS.md).
 
-## Phase 4 — GUI apps
+## Phase 4 — GUI apps (v1 done)
 
-- macOS app (SwiftUI) over `EsysCore`: connect wizard, module list, settings
-  browser (from cheat sheets + eventually CAFD parsing), one-click toggles,
-  backup management, restore button.
-- iOS app: same core; ENET via Apple USB-C/Lightning Ethernet adapter or a WiFi
-  ENET bridge (both confirmed working by BimmerCode's adapter matrix).
+- ✅ One SwiftUI codebase (`Sources/EsysApp`) over `EsysCore`, shipped two
+  ways: `swift run EsysApp` / `Scripts/make-mac-app.sh` on the Mac, and the
+  `Apps/EsysApp.xcodeproj` iOS app (iPhone/iPad; ENET via Apple USB-C Ethernet
+  adapter or a WiFi ENET bridge). Verified: `swift build` (macOS) and an
+  iOS-Simulator `xcodebuild` both pass.
+- ✅ Car tab: one-click virtual-car demo (connect → identify → scan → read
+  HU_NBT), UDP discover + candidate probing, real-car connect & scan with a
+  live module list (names + SVK/CAFD ids), per-module coding read.
+- ✅ Coding tab: backup browser (sections + hex preview), cheat-sheet import
+  with current-value decode and already-active detection, apply with verify,
+  restore, backup save/load (same JSON as the CLI).
+- ✅ CAFD tab: open decrypted CAFD XML (gzip ok) + names TSV, series-resolved
+  coding rules, search, current-value join against the backup, queue + apply.
+- Follow-ups: E-Sys Launcher cheat-format import (Phase 5 leftover), a
+  side-by-side diff view, first real-car smoke test (Phase 2).
 
 ## Phase 5 — "all the settings"
 
