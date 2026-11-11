@@ -29,11 +29,14 @@ final class MockCarEndToEndTests: XCTestCase {
         XCTAssertEqual(hu?.svk?.primaryCAFD?.id, 0x0000F007)
         XCTAssertTrue(modules.contains { $0.name == "KOMBI" })
 
-        // 3. Coding read discovers the sections and snapshots them.
+        // 3. Coding read discovers the sections and snapshots them (with SVK).
         let backup = try await session.readCoding(ecu: car.huNBTAddress, ecuName: "HU_NBT")
         XCTAssertEqual(backup.sections.map(\.did), [3000, 3001, 3002, 3010])
         XCTAssertEqual(backup.sectionBytes(3000)?.count, 256)
         XCTAssertEqual(backup.sectionBytes(3000)?[96], 0x00)
+        let svkHex = try XCTUnwrap(backup.svkHex)
+        XCTAssertEqual(SVK.parse(try XCTUnwrap(Bytes.fromHex(svkHex))).primaryCAFD?.id,
+                       0x0000F007)
 
         // 4. Writing without a security algorithm fails with a clear error.
         do {

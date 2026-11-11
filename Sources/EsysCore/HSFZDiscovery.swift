@@ -54,7 +54,14 @@ public enum HSFZDiscovery {
         _ = setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &rcvTimeout, socklen_t(MemoryLayout<timeval>.size))
 
         let request = identRequest()
-        for target in broadcastAddresses + unicast {
+        var targets = broadcastAddresses + unicast
+        // Also ask every host in our own link-local /24 subnets directly —
+        // covers the case where the Mac and the car ended up in the same
+        // subnet but broadcast is filtered somewhere on the way.
+        for subnet in NetworkInterfaces.linkLocalSubnets() {
+            targets += (1...254).map { "\(subnet).\($0)" }
+        }
+        for target in targets {
             guard let addr = sockaddr_in(address: target, port: identPort) else { continue }
             withUnsafePointer(to: addr) { pointer in
                 pointer.withMemoryRebound(to: sockaddr.self, capacity: 1) { sockaddrPointer in

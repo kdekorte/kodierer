@@ -50,6 +50,7 @@ case "help", "--help", "-h":
     esys — BMW F-series coding toolkit
 
     USAGE:
+      esys interface                          show network interfaces + ENET link check
       esys discover [--timeout 2]            find cars on the link-local network (UDP 6811 + probe)
       esys scan --host <ip> [--dwell 0.25]   connect, read VIN/I-Step, list ECUs (SVT)
       esys read --host <ip> [--ecu 63] [--out file.json]
@@ -63,6 +64,24 @@ case "help", "--help", "-h":
     SAFETY: writes to a real car require a backup (esys read) and the HU_NBT
     security algorithm, which is not implemented yet — see Docs/PROTOCOL.md.
     """)
+
+case "interface":
+    let interfaces = NetworkInterfaces.list().filter { !$0.ipv4.isEmpty }
+    for interface in interfaces {
+        let mark = interface.hasLinkLocal ? "  <- link-local (ENET link looks up)" : ""
+        print("\(interface.name): \(interface.ipv4.joined(separator: ", "))\(mark)")
+    }
+    if NetworkInterfaces.linkLocalAddresses().isEmpty {
+        print("""
+        no 169.254.x.x address yet.
+          1. plug the ENET cable into the car (ignition on) and the adapter into the Mac
+          2. System Settings > Network > (the USB/Lightning Ethernet adapter) > "Using DHCP"
+          3. wait ~30 s — macOS shows "Self-Assigned IP" when it picks 169.254.x.x, that is GOOD
+          4. run this again, then `esys discover`
+        """)
+    } else {
+        print("link-local address present — run `esys discover` next")
+    }
 
 case "discover":
     let timeout = Double(options["timeout"] ?? "") ?? 2.0
@@ -125,6 +144,14 @@ case "read":
             print("  read section \(did)")
         }
         print("\(backup.sections.count) sections, \(backup.sections.reduce(0) { $0 + $1.bytes.count }) bytes")
+        if let svkHex = backup.svkHex, let svkBytes = Bytes.fromHex(svkHex) {
+            let svk = SVK.parse(svkBytes)
+            if let cafd = svk.primaryCAFD {
+                print("CAFD in this module: \(cafd.fileName)  (report this — it pins the parameter data)")
+            } else {
+                print("SVK: \(svkHex)  (no CAFD entry recognized — please report)")
+            }
+        }
         let out = options["out"]
             ?? "coding_\(identity.vin ?? "car")_0x\(String(ecu, radix: 16))_\(Int(Date().timeIntervalSince1970)).json"
         let url = URL(fileURLWithPath: out)

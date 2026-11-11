@@ -29,4 +29,24 @@ public enum Bytes {
     public static func ascii(_ bytes: [UInt8]) -> String {
         String(bytes: bytes.filter { $0 >= 0x20 && $0 < 0x7F }, encoding: .ascii) ?? ""
     }
+
+    /// Hex without separators, e.g. "00FF0A" — for storing raw blobs in JSON.
+    public static func hexCompact(_ bytes: [UInt8]) -> String {
+        bytes.map { String(format: "%02X", $0) }.joined()
+    }
+
+    /// Parses compact or space-separated hex back to bytes. Nil when malformed.
+    public static func fromHex(_ text: String) -> [UInt8]? {
+        let clean = text.filter { !$0.isWhitespace }
+        guard !clean.isEmpty, clean.count % 2 == 0 else { return nil }
+        var bytes: [UInt8] = []
+        var index = clean.startIndex
+        while index < clean.endIndex {
+            let next = clean.index(index, offsetBy: 2, limitedBy: clean.endIndex) ?? clean.endIndex
+            guard let value = UInt8(clean[index..<next], radix: 16) else { return nil }
+            bytes.append(value)
+            index = next
+        }
+        return bytes
+    }
 }

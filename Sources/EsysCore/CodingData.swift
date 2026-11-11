@@ -40,14 +40,19 @@ public struct CodingBackup: Codable, Equatable, Sendable {
     /// Diagnostic address of the ECU, e.g. 0x63 for HU_NBT.
     public let ecuAddress: Int
     public let ecuName: String?
+    /// Raw SVK (DID 0xF101) as compact hex, when it could be read — it names
+    /// the CAFD the coding data belongs to (e.g. CAFD_00000F07_013_001_009).
+    public let svkHex: String?
     public var sections: [CodingSection]
 
-    public init(vin: String?, ecuAddress: Int, ecuName: String?, sections: [CodingSection]) {
+    public init(vin: String?, ecuAddress: Int, ecuName: String?, svkHex: String? = nil,
+                sections: [CodingSection]) {
         self.schema = 1
         self.created = Date()
         self.vin = vin
         self.ecuAddress = ecuAddress
         self.ecuName = ecuName
+        self.svkHex = svkHex
         self.sections = sections.sorted { $0.did < $1.did }
     }
 

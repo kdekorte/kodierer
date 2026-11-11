@@ -46,7 +46,17 @@ public enum CodingEngine {
                 "no coding sections found at ECU 0x\(String(ecu, radix: 16)) " +
                 "(is it present, and is the address right?)")
         }
-        var backup = CodingBackup(vin: vin, ecuAddress: Int(ecu), ecuName: ecuName, sections: [])
+        // Best effort: the SVK names the CAFD this coding data belongs to.
+        var svkHex: String?
+        if let reply = try? await transport.request(to: ecu, UDS.readDID(BMWDID.svk),
+                                                     timeout: timeout) {
+            let response = UDSResponse(raw: reply)
+            if !response.isNegative, response.data.count > 2 {
+                svkHex = Bytes.hexCompact(Array(response.data.dropFirst(2)))
+            }
+        }
+        var backup = CodingBackup(vin: vin, ecuAddress: Int(ecu), ecuName: ecuName,
+                                  svkHex: svkHex, sections: [])
         for did in sections {
             let reply = try await transport.request(to: ecu, UDS.readDID(UInt16(did)), timeout: timeout)
             let response = UDSResponse(raw: reply)

@@ -48,6 +48,9 @@ swift run esys scan --host 169.254.9.103     # VIN, I-Step, list of modules
 swift run esys read --host 169.254.9.103 --ecu 63 --out hu_backup.json
 ```
 
+Guided walkthrough for the target car (ENET cable + USB-C Ethernet adapter):
+see **`Docs/FIRST_CONTACT.md`**.
+
 Hardware: an **ENET cable** into a USB-C Ethernet adapter on the Mac (and later,
 per BimmerCode's own docs, the same works with an Apple Lightning/USB-C Ethernet
 adapter on iPhone, or a WiFi ENET bridge dongle).
