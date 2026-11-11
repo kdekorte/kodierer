@@ -1,8 +1,10 @@
-# F25 cheat sheet — curated from "F25_Cheat_Sheet_April1_v8-01.pdf"
-# (E-Sys Documents). Function names and value meanings only — no byte offsets;
-# the offsets come from the CAFD + names TSV. FORMAT:
+# F25 / F30 NBT Evo cheat sheet — curated from "F25_Cheat_Sheet_April1_v8-01.pdf"
+# (E-Sys Documents) plus NBT Evo X/Y-firmware additions. Function names and
+# value meanings only — no byte offsets; the offsets come from the CAFD +
+# names TSV. FORMAT:
 # NAME	DESCRIPTION	CATEGORY	MODULE	SECTION
 NAME	DESCRIPTION	CATEGORY	MODULE	SECTION
+CARPLAY_FULLSCREEN	Full-screen CarPlay: on X/Y firmware the head unit has the native toggle built in — no third-party patch needed. Set aktiv / Werte=01 (HU_NBT2 or HU_NBT_EVO target).	Media	HU_NBT2	3000
 ER_KEYOUT_AUTOVR	Unlock doors when engine is stopped (single pull to open doors).	Comfort	CAS	3002
 KOMFORTSCHLIESSUNG_FB	Close mirrors + windows + moon roof through the key fob. Requires ASP_BEIKLAPPEN_BEI_KOMFORTSCHLIESSEN aktiv in FRM.	Comfort	CAS	3003
 KOMFORTSCHLIESSUNG_PA	Close mirrors + windows + moon roof through Comfort Access. Requires ASP_BEIKLAPPEN_BEI_KOMFORTSCHLIESSEN aktiv in FRM.	Comfort	CAS	3003
