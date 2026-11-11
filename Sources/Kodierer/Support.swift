@@ -116,3 +116,23 @@ struct BackupDocument: FileDocument {
         return FileWrapper(regularFileWithContents: try encoder.encode(backup))
     }
 }
+
+/// Plain-text wrapper so SwiftUI's fileExporter can save the session log.
+struct TextDocument: FileDocument {
+    static var readableContentTypes: [UTType] { [.plainText] }
+
+    let text: String
+
+    init(_ text: String) { self.text = text }
+
+    init(configuration: ReadConfiguration) throws {
+        guard let data = configuration.file.regularFileContents else {
+            throw CocoaError(.fileReadCorruptFile)
+        }
+        text = String(decoding: data, as: UTF8.self)
+    }
+
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        FileWrapper(regularFileWithContents: Data(text.utf8))
+    }
+}

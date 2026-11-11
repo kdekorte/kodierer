@@ -1,0 +1,20 @@
+# F25 cheat sheet — curated from "F25_Cheat_Sheet_April1_v8-01.pdf"
+# (E-Sys Documents). Function names and value meanings only — no byte offsets;
+# the offsets come from the CAFD + names TSV. FORMAT:
+# NAME	DESCRIPTION	CATEGORY	MODULE	SECTION
+NAME	DESCRIPTION	CATEGORY	MODULE	SECTION
+ER_KEYOUT_AUTOVR	Unlock doors when engine is stopped (single pull to open doors).	Comfort	CAS	3002
+KOMFORTSCHLIESSUNG_FB	Close mirrors + windows + moon roof through the key fob. Requires ASP_BEIKLAPPEN_BEI_KOMFORTSCHLIESSEN aktiv in FRM.	Comfort	CAS	3003
+KOMFORTSCHLIESSUNG_PA	Close mirrors + windows + moon roof through Comfort Access. Requires ASP_BEIKLAPPEN_BEI_KOMFORTSCHLIESSEN aktiv in FRM.	Comfort	CAS	3003
+ASP_BEIKLAPPEN_BEI_KOMFORTSCHLIESSEN	Fold the mirrors during comfort closing — prerequisite for the CAS comfort-close options.	Comfort	FRM	3020
+SCH_FBD	Open/close the trunk or tailgate via the key fob button.	Comfort	HKFM	3010
+TASTER_FBD	Trunk/tailgate via button (fob and driver-side switch).	Comfort	HKFM	3010
+SCH_TOEHKI	Close the trunk/tailgate through the driver-side switch.	Comfort	HKFM	3010
+SPEEDLOCK_X_KMH_MAX	DVD in Motion: speed above which video playback stays unlocked. FF = never lock.	Media	HU_CIC	3000
+SPEEDLOCK_X_KMH_MIN	DVD in Motion: speed below which playback is locked. FF = never lock.	Media	HU_CIC	3000
+VIDEO_NUR_MIT_HANDBREMSE	DVD in Motion: video playback only with the handbrake on.	Media	HU_CIC	3000
+LEGAL_DISCLAIMER_TIME	Disables the iDrive legal disclaimer during startup (kein_ld).	Display	HU_CIC	3001
+MACRO_CAM_LEGALDISCLAIMER	Disables the camera legal disclaimer (kein_ld).	Display	HU_CIC	3001
+MACRO_NIVICAM_LDISCLAIMER	Disables the night-vision camera legal disclaimer (kein_ld).	Display	HU_CIC	3001
+RDC_SAFETY	Add pressure and temperature readings to the TPMS screen.	Display	HU_CIC	3001
+INBAND_RINGING	The telephone ringtone is transferred to the Combox.	Media	CMB_MEDIA	3001

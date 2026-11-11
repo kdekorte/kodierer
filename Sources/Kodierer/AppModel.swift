@@ -42,11 +42,15 @@ final class AppModel: ObservableObject {
     @Published var cafdFileName = ""
     @Published var cafdSeries = "F025"
     @Published var names: CAFDNames?
+    /// Plain-language option descriptions, keyed by function name.
+    @Published var descriptions: OptionDescriptions?
 
-    // MARK: Feedback
+    // MARK: Feedback / session log
 
     @Published var message: String?
     @Published var errorText: String?
+    /// Chronological log of every connection, read and write action this session.
+    @Published private(set) var actionLog: [String] = []
 
     var session: VehicleSession?
     private(set) var mockCar: MockCar?
@@ -68,6 +72,13 @@ final class AppModel: ObservableObject {
     func showMessage(_ text: String) { message = text; errorText = nil }
     func showError(_ error: Error) { errorText = String(describing: error); message = nil }
     func clearFeedback() { message = nil; errorText = nil }
+
+    /// Appends a timestamped line to the session log (kept for the whole run).
+    func log(_ line: String) {
+        let stamp = ISO8601DateFormatter().string(from: Date())
+        actionLog.append("\(stamp)  \(line)")
+        if actionLog.count > 500 { actionLog.removeFirst(actionLog.count - 500) }
+    }
 
     // MARK: Connection
 
@@ -96,6 +107,7 @@ final class AppModel: ObservableObject {
             }
             busy = ""
             showMessage("Virtual car is up (VIN \(identity?.vin ?? "?"), \(modules.count) modules) and HU_NBT coding is read in. Switch to Coding or CAFD.")
+            log("Demo: connected virtual car, VIN \(identity?.vin ?? "?"), \(modules.count) modules, read \(backup?.sections.count ?? 0) sections from HU_NBT")
         } catch {
             busy = ""
             showError(error)
@@ -140,6 +152,7 @@ final class AppModel: ObservableObject {
             scanning = false
             busy = ""
             showMessage("VIN \(identity?.vin ?? "?"), I-Step \(identity?.iStepText.first ?? "?") — \(modules.count) modules found.")
+            log("Connected to \(host): VIN \(identity?.vin ?? "?"), \(modules.count) modules")
         } catch {
             scanning = false
             busy = ""
@@ -157,6 +170,7 @@ final class AppModel: ObservableObject {
         modules = []
         queue = []
         busy = ""
+        log("Disconnected")
         showMessage("Disconnected.")
     }
 
@@ -168,6 +182,7 @@ final class AppModel: ObservableObject {
         reading = true
         do {
             backup = try await session.readCoding(ecu: module.address, ecuName: module.name)
+            log("Read coding from \(module.displayName): \(backup?.sections.count ?? 0) sections, \(backup?.sections.reduce(0) { $0 + $1.bytes.count } ?? 0) bytes")
             showMessage("Read \(backup?.sections.count ?? 0) sections from \(module.displayName) — continue in the Coding tab.")
         } catch {
             showError(error)

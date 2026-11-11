@@ -8,6 +8,7 @@ to parse are skipped silently.
 | Folder | Contents | Source |
 |---|---|---|
 | `Data/names/*.tsv` | Community parameter names, merged if several files. | OpenCAFDMap `names/*.tsv` (CC0) |
+| `Data/options/*.tsv` | Plain-language option descriptions keyed by function name (`NAME\tDESCRIPTION\tCATEGORY\tMODULE\tSECTION`). Gives the option tree its readable text and a category fallback. | curated from F10/F25/F30 cheat-sheet PDFs — see `Data/options/f25-cheatsheet.tsv` |
 | `Data/cafds/` | Decrypted CAFD XML for one ECU, plain or gzip (`.xml`, `.xml.gz`). The first parseable file is loaded. | OpenCAFDMap decrypted cache; E-Sys via the PsdZ library |
 | `Data/cheats/*.xml` | FDLCodes-style cheat sheets (`<CAFD>` blocks with codes). | FDLCodes.xml community exports |
 | `Data/backups/*.json` | Saved coding backups. The newest is loaded as the current snapshot. | This app's "Save…" |

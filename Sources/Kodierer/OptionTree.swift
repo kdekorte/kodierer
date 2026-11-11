@@ -20,9 +20,11 @@ struct CodingChoice: Identifiable, Equatable {
 struct CodingOption: Identifiable, Equatable {
     /// PendingChange.key for this function.
     let key: String
-    var id: String { key }
+    let id: String
     let category: String
     let title: String
+    /// Plain-language description from the community option list, if any.
+    let description: String?
     /// Human-readable context: section, byte range, mask.
     let subtitle: String
     let datagroup: CAFD.Datagroup
@@ -44,7 +46,8 @@ struct OptionCategory: Identifiable {
 /// Builds the option tree from the loaded definitions and the current state.
 enum OptionTree {
 
-    static func categories(cafd: CAFD, names: CAFDNames?, backup: CodingBackup?) -> [OptionCategory] {
+    static func categories(cafd: CAFD, names: CAFDNames?, descriptions: OptionDescriptions? = nil,
+                           backup: CodingBackup?) -> [OptionCategory] {
         var byCategory: [String: [CodingOption]] = [:]
         var order: [String] = []
 
@@ -56,7 +59,9 @@ enum OptionTree {
 
                 let title = names?.functionName(datagroup: datagroup, function: function)
                     ?? function.placeholderName
+                let described = descriptions?.entry(named: title)
                 let category = names?.functionCategory(datagroup: datagroup, function: function)
+                    ?? described?.category
                     ?? names?.groupName(datagroup: datagroup)
                     ?? String(format: "Section %04X", datagroup.address)
 
@@ -80,7 +85,9 @@ enum OptionTree {
 
                 let option = CodingOption(
                     key: PendingChange.key(datagroup: datagroup, function: function),
-                    category: category, title: title, subtitle: subtitle,
+                    id: PendingChange.key(datagroup: datagroup, function: function),
+                    category: category, title: title, description: described?.description,
+                    subtitle: subtitle,
                     datagroup: datagroup, function: function, choices: choices,
                     currentChoiceID: current?.hex)
 

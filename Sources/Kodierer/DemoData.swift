@@ -158,6 +158,19 @@ enum DemoData {
     ANY\t3062\t0\t0\t255\t01\tActive\t\tComfort
     """
 
+    /// Demo option descriptions — the OptionDescriptions TSV format
+    /// (NAME, DESCRIPTION, CATEGORY), joined by function name.
+    static let descriptionsTSV = """
+    # Demo descriptions (synthetic) — OptionDescriptions format
+    # NAME\tDESCRIPTION\tCATEGORY\tMODULE\tSECTION
+    NAME\tDESCRIPTION\tCATEGORY\tMODULE\tSECTION
+    CARPLAY_FULLSCREEN\tShow CarPlay full-screen instead of letterboxed (demo bit — synthetic).\tMedia\tHU_NBT\t3000
+    STARTUP_SCREEN\tWhich logo the head unit shows at startup (demo — synthetic).\tDisplay\tHU_NBT\t3000
+    VIDEO_SPEED_LOCK\tKeep video playback unlocked while driving (demo — synthetic).\tComfort\tHU_NBT\t3000
+    START_VOLUME\tAudio volume the head unit starts up with (demo — synthetic).\tMedia\tHU_NBT\t3000
+    AUTO_HOLD\tHold the car automatically when it stops (demo — synthetic).\tComfort\tHU_NBT\t3062
+    """
+
     /// The demo cheat code: the same synthetic bit MockCar's demo uses.
     static func cheatCodes() -> [FDLCheatCode] {
         [FDLCheatCode(cafdID: nil, cafdName: "HU_NBT",

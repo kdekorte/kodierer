@@ -12,7 +12,9 @@ struct CodingView: View {
     @State private var showNamesImporter = false
     @State private var showBackupImporter = false
     @State private var showBackupExporter = false
+    @State private var showLogExporter = false
     @State private var confirmRestore = false
+    @State private var confirmDefaults = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -57,6 +59,10 @@ struct CodingView: View {
                         .disabled(!model.isConnected)
                     Button("Restore") { confirmRestore = true }
                         .disabled(!model.isConnected)
+                    Button("Defaults…") { confirmDefaults = true }
+                        .disabled(!model.isConnected || model.cafd == nil)
+                    Button("Log…") { showLogExporter = true }
+                        .disabled(model.actionLog.isEmpty)
                 }
                 .padding(.vertical, 2)
             }
@@ -125,6 +131,25 @@ struct CodingView: View {
         } message: {
             Text("Writes every section of the backup back to the car. On a real HU_NBT this needs the security algorithm, which is not implemented yet — the write will be refused.")
         }
+        .confirmationDialog("Reset every known function to its factory default?",
+                            isPresented: $confirmDefaults, titleVisibility: .visible) {
+            Button("Reset to defaults", role: .destructive) { Task { await model.restoreDefaults() } }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Writes the CAFD's default value to every function whose current bytes differ — this undoes all coding on functions the loaded CAFD knows. The snapshot above stays available for Restore.")
+        }
+        .fileExporter(isPresented: $showLogExporter, document: TextDocument(model.actionLog.joined(separator: "\n")),
+                      contentType: .plainText, defaultFilename: logName()) { result in
+            if case .success(let url) = result {
+                model.showMessage("Saved session log \(url.lastPathComponent)")
+            }
+        }
+    }
+
+    private func logName() -> String {
+        let stamp = ISO8601DateFormatter().string(from: Date())
+            .replacingOccurrences(of: ":", with: "-")
+        return "kodierer-session-\(stamp).txt"
     }
 
     // MARK: Option tree
@@ -132,7 +157,8 @@ struct CodingView: View {
     /// The BimmerCode-style tree: one section per category, one row per option.
     @ViewBuilder private func optionSections(_ cafd: CAFD) -> some View {
         let categories = OptionTree.filter(
-            OptionTree.categories(cafd: cafd, names: model.names, backup: model.backup),
+            OptionTree.categories(cafd: cafd, names: model.names,
+                                  descriptions: model.descriptions, backup: model.backup),
             matching: searchText)
         ForEach(categories) { category in
             Section {

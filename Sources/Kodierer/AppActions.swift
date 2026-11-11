@@ -34,6 +34,64 @@ extension AppModel {
         queueSet(value: choice.value, function: option.function, datagroup: option.datagroup)
     }
 
+    /// Sets a raw hex value for an option (the "edit Werte" escape hatch for
+    /// numeric parameters whose value is not one of the named choices).
+    func setRaw(hex: String, for option: CodingOption) {
+        guard let bytes = CAFD.parseHexBytes(hex), !bytes.isEmpty else {
+            showMessage("“\(hex)” is not valid hex bytes (e.g. 0A or 00FF).")
+            return
+        }
+        let key = PendingChange.key(datagroup: option.datagroup, function: option.function)
+        queue.removeAll { $0.key == key }
+        queue.append(PendingChange(
+            label: "\(option.title) = raw \(hex.uppercased())",
+            operation: FDLOperation(group: option.datagroup.address,
+                                    start: option.function.start, end: option.function.end,
+                                    mask: option.function.mask ?? 0xFF, value: .bytes(bytes)),
+            key: key, choiceID: nil))
+    }
+
+    /// Resets every CAFD-known function back to its factory default value —
+    /// writes only the functions whose current bytes differ from the default.
+    func restoreDefaults() async {
+        guard let session, let backup else { showMessage("Connect and read coding data first."); return }
+        guard let cafd else { showMessage("Load the CAFD for this ECU first (Coding or CAFD tab)."); return }
+        var operations: [FDLOperation] = []
+        var titles: [String] = []
+        for datagroup in cafd.datagroups {
+            for function in datagroup.functions {
+                guard let defaultValue = function.defaultValue,
+                      let bytes = defaultValue.bytes, !bytes.isEmpty,
+                      cafd.currentValue(of: function, in: datagroup, backup: backup) != defaultValue
+                else { continue }
+                operations.append(FDLOperation(group: datagroup.address,
+                                                start: function.start, end: function.end,
+                                                mask: function.mask ?? 0xFF, value: .bytes(bytes)))
+                titles.append(names?.functionName(datagroup: datagroup, function: function)
+                              ?? function.placeholderName)
+            }
+        }
+        guard !operations.isEmpty else {
+            showMessage("The backup already matches every factory default.")
+            return
+        }
+        applying = true
+        do {
+            let summary = titles.count <= 5
+                ? titles.joined(separator: ", ")
+                : titles.prefix(5).joined(separator: ", ") + " + \(titles.count - 5) more"
+            let modified = try await session.applyOperations(
+                operations, to: backup, description: "factory defaults: \(summary)",
+                security: securityAlgorithm)
+            self.backup = modified
+            log("Restored \(operations.count) function(s) to factory defaults — verified by re-read")
+            showMessage("Restored \(operations.count) functions to factory defaults — verified by re-read.")
+        } catch {
+            showError(error)
+        }
+        applying = false
+    }
+
     func applyQueue() async {
         guard let session, let backup, !queue.isEmpty else { return }
         applying = true
@@ -45,6 +103,7 @@ extension AppModel {
                 security: securityAlgorithm)
             self.backup = modified
             queue = []
+            log("Wrote \(operations.count) queued change(s) — verified by re-read")
             showMessage("Applied and verified — new snapshot kept in memory, save it from the Coding tab.")
         } catch {
             showError(error)
@@ -57,6 +116,7 @@ extension AppModel {
         applying = true
         do {
             self.backup = try await session.apply(entry.code, to: backup, security: securityAlgorithm)
+            log("Applied cheat code “\(entry.code.description)” — verified by re-read")
             showMessage("Applied “\(entry.code.description)” — verified by re-read.")
         } catch {
             showError(error)
@@ -69,6 +129,7 @@ extension AppModel {
         applying = true
         do {
             try await session.restore(backup, security: securityAlgorithm)
+            log("Restored snapshot (\(backup.sections.count) sections) to the ECU")
             showMessage("Restored the saved snapshot back to the ECU.")
         } catch {
             showError(error)
@@ -129,6 +190,7 @@ extension AppModel {
         cafdData = Data(DemoData.cafdXML.utf8)
         cafdFileName = "demo-cafd.xml (built-in)"
         names = CAFDNames.parse(text: DemoData.namesTSV)
+        descriptions = OptionDescriptions.parse(text: DemoData.descriptionsTSV)
         reloadCAFD()
         showMessage("Loaded built-in demo definitions (synthetic data, no real offsets).")
     }
@@ -214,6 +276,21 @@ extension AppModel {
                     reloadCAFD()
                     loaded.append(url.lastPathComponent)
                     break
+                }
+            }
+
+            // Option descriptions — every *.tsv merged into one list.
+            let optionFiles = list(folder, "options", extensions: ["tsv"])
+            if !optionFiles.isEmpty {
+                var merged = descriptions ?? OptionDescriptions(entries: [])
+                for url in optionFiles {
+                    if let parsed = try? OptionDescriptions.parse(url: url) {
+                        merged = merged.merged(with: parsed)
+                    }
+                }
+                if !merged.entries.isEmpty {
+                    descriptions = merged
+                    loaded.append("\(optionFiles.count) option description file(s)")
                 }
             }
 
